@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
+/* @import url("./Components/Layout/SideBar/SideBar.css"); */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+@custom-variant dark (&:where(.dark, .dark *));
 
 html,
 body {
@@ -12,4 +14,50 @@ body {
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+  @media (prefers-color-scheme: light) {
+    color-scheme: light;
+  }
 }
+
+/* Sidebar */
+.sidebar {
+    @apply flex-shrink-0 w-64 bg-white border-r
+    border-gray-200 transition-all duration-300 ease-in-out overflow-hidden relative z-20
+    dark:bg-gray-800 dark:border-gray-700;
+}
+
+.sidebar-header{
+    @apply text-center flex items-center justify-center h-16 border-b border-gray-200 px-4 dark:border-gray-50
+}
+.sidebar-nav{
+    @apply mt-4 overflow-y-auto; max-height: calc(100% - 64px);
+}
+.sidebar-item {
+    @apply flex items-center py-3 px-4 rounded-lg text-gray-700 hover:bg-gray-50 mx-2 mb-2 
+    transition-colors duration-200 ease-in-out dark:text-gray-200 dark:hover:bg-gray-700 gap-2;
+}
+
+/* Botones */
+        .btn {
+            @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+
+        .btn-primary {
+            @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+        }
+
+        .btn-secondary {
+            @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+        }
+
+        .btn-danger {
+            @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+        }
+
+        .btn-ghost {
+            @apply btn bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-400 dark:hover:bg-gray-800;
+        }
+
+        .btn-icon {
+            @apply p-2 rounded-full;
+        }

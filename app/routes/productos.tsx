@@ -1,21 +1,20 @@
+import type { Route } from "../+types/root";
 import { Welcome } from "~/Components/Welcome/Welcome";
-import type { Route } from "./+types/home";
-import { icons } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "Home" },
+    { title: "Productos" },
     { name: "description", content: "Welcome to React Router!" },
   ];
 }
 
-export default function Home() {
-  const description:IDescription ={
-    
-  } 
+export default function Productos() {
+    const description:IDescription ={
 
-  return <Welcome 
-  title="Bienvenido Jordan"
+    } 
+
+return <Welcome 
+  title="Bienvenido Productos"
   isIcon = {false}
   descripcion={description}
   

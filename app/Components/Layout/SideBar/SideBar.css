@@ -1,0 +1,17 @@
+/* Sidebar */
+.sidebar {
+    @apply flex-shrink-0 w-64 bg-white border-r
+    border-gray-200 transition-all duration-300 ease-in-out overflow-hidden relative z-20
+    dark:bg-gray-800 dark:border-gray-700;
+}
+
+.sidebar-header{
+    @apply text-center flex items-center justify-center h-16 border-b border-gray-200 px-4 dark:border-gray-50
+}
+.sidebar-nav{
+    @apply mt-4 overflow-y-auto; max-height: calc(100% - 64px);
+}
+.sidebar-item {
+    @apply flex items-center py-3 px-4 rounded-lg text-gray-700 hover:bg-gray-50 mx-2 mb-2 
+    transition-colors duration-200 ease-in-out dark:text-gray-200 dark:hover:bg-gray-700 gap-2;
+}
