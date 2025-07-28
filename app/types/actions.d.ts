@@ -1,3 +1,5 @@
-interface actionsModal{
-    setOpen(): void
+interface IActionsModal {
+  isOpen: boolean;
+  onClose: () => void;
+  content?: React.ReactNode;
 }
