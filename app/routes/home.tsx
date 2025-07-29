@@ -1,7 +1,7 @@
 import { Welcome } from "~/Components/Welcome/Welcome";
 import type { Route } from "./+types/home";
 import { icons } from "lucide-react";
-import DataGrid from "~/Components/DataGrid/DataGrid";
+import {DataGrid} from "~/Components/DataGrid/DataGrid";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -11,13 +11,24 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const description:IDescription ={
-    
+  const iDataHeader:IDataHeader ={
+    title: ""
   } 
+
+
+  const iDataBody:IDataBody ={
+    
+  }
+
+  const iDataPagintor: IDataPaginator={}
 
   return (
     <>
-    <DataGrid />    
+    <DataGrid      
+    dataHeader={iDataHeader}
+    dataBody ={iDataBody}
+    dataPaginator ={iDataPagintor}
+    />    
     </>
   )
   
