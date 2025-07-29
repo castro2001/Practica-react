@@ -7,11 +7,11 @@ export const DataGrid = (props: IDataGrid)=> {
   const { dataHeader, dataBody,dataPaginator } = props;
   const {title,btn_text,isSearch,isUpdate} = dataHeader;
   const {data= []} = dataBody;
-  const {} = dataPaginator;
+  const {pagina,paginaActual,setPaginaActual,dataFiltrada = data,setDataFiltrada} = dataPaginator;
 
   return (
     <>
-   <div className="mx-auto ">
+   <div className="container mx-auto max-w-5xl   rounded-lg shadow-lg overflow-hidden ">
      <DataHeader 
       title={title}
       btn_text={btn_text} 
@@ -20,9 +20,16 @@ export const DataGrid = (props: IDataGrid)=> {
     />
     <DataBody 
     data={data}
-    
+    buscador=''
     />
-    <DataPaginator />
+    <DataPaginator 
+    pagina={pagina}
+    paginaActual={paginaActual} 
+    setPaginaActual={setPaginaActual} 
+    dataFiltrada={dataFiltrada} 
+    setDataFiltrada={setDataFiltrada}
+
+    />
    </div>
     
     </>

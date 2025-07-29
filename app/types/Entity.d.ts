@@ -14,12 +14,19 @@ interface IDataHeader{
 
 
 interface IDataBody{
-    data?: IProduct[]
+    data?: IProduct[];
+    buscador:string;
 }
 
 
 interface IDataPaginator{
+    pagina:number;
+    paginaActual: number;
+    setPaginaActual: (number : number) => number;
     
+    dataFiltrada: IProduct[];
+    setDataFiltrada: (data: IProduct[])=>void;
+
 }
 
 interface IProduct{
@@ -27,6 +34,7 @@ interface IProduct{
     title:string;
     slug:string
     price:number;
+    description:string;
     category: Category;
     images: string[]
     creationAt: Date;
