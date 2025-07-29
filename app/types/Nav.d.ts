@@ -1,5 +1,6 @@
 interface INavItemProps{
     navItems: INavItem[] ;
+  sidebarOpen: boolean;
 }
 
 interface INavItem{

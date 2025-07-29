@@ -3,9 +3,11 @@ import { useState,useEffect } from "react";
 import { Menu, Moon, Sun} from "lucide-react"
 import BackgroundDefault from "~/assets/image/background_default.png"
 import { ModalNotificaciones } from "~/Components/ModalNotificaciones/ModalNotificaciones";
+import Usuario from "~/assets/image/usuario.png";
 
+export const Header = (props: IActionSideBar)=>{
+    const { sidebarOpen, setSidebarOpen } = props;
 
-export const Header = ()=>{
     const [theme,setTheme] = useState('light');
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenPanel, setIsOpenPanel] = useState(false);
@@ -146,7 +148,7 @@ export const Header = ()=>{
         <header className="flex-shrink-0 flex items-center justify-between h-16 px-4 shadow-sm bg-white dark:bg-gray-800 relative z-10">
            
             <div className="flex items-center">
-                <button className="">
+                <button className="" onClick={() => setSidebarOpen(!sidebarOpen)}>
                 <Menu className="h-6 w-6 cursor-pointer text-black dark:text-white" />
                 </button>
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 ml-3">Bandeja de Entrada</h2>
@@ -198,8 +200,8 @@ export const Header = ()=>{
             </button>
 
                 <div className="relative" id="userMenuDropdown">
-                    <button onClick={() => setIsOpenPanelUser(!isOpenPanelUser)} className="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                        <img className="h-10 w-10 rounded-full object-cover" src={BackgroundDefault} alt="User Avatar"/>
+                    <button onClick={() => setIsOpenPanelUser(!isOpenPanelUser)} className="cursor-pointer flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
+                        <img className="h-10 w-10 rounded-full object-cover" src={Usuario} alt="User Avatar"/>
                     </button>
 
                     <div id="userMenuPanel" className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-40 hidden">

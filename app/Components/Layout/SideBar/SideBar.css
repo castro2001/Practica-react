@@ -1,17 +1,37 @@
-/* Sidebar */
-.sidebar {
-    @apply flex-shrink-0 w-64 bg-white border-r
-    border-gray-200 transition-all duration-300 ease-in-out overflow-hidden relative z-20
-    dark:bg-gray-800 dark:border-gray-700;
-}
+        .sidebar {
+            transition: width 0.3s ease-in-out, background-color 0.3s ease, border-color 0.3s ease;
+            will-change: width;
+        }
+        .sidebar-expanded {
+            width: 256px; /* w-64 en Tailwind */
+        }
+        .sidebar-collapsed {
+            width: 80px; /* w-20 en Tailwind */
+        }
+        /* Efecto de expansión al pasar el ratón cuando está colapsado */
+        .sidebar-collapsed:hover {
+            width: 256px; /* Expansión al hover */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Sutil sombra */
+        }
+        .dark .sidebar-collapsed:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
 
-.sidebar-header{
-    @apply text-center flex items-center justify-center h-16 border-b border-gray-200 px-4 dark:border-gray-50
-}
-.sidebar-nav{
-    @apply mt-4 overflow-y-auto; max-height: calc(100% - 64px);
-}
-.sidebar-item {
-    @apply flex items-center py-3 px-4 rounded-lg text-gray-700 hover:bg-gray-50 mx-2 mb-2 
-    transition-colors duration-200 ease-in-out dark:text-gray-200 dark:hover:bg-gray-700 gap-2;
-}
+        /* Oculta el texto de los enlaces del sidebar cuando está colapsado */
+        .sidebar-text {
+            transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out;
+            white-space: nowrap;
+        }
+        .sidebar-collapsed .sidebar-text {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
+        /* Asegura que el texto siempre sea visible si el sidebar está expandido */
+        .sidebar-expanded .sidebar-text {
+            opacity: 1;
+            width: auto;
+            height: auto;
+            overflow: visible;
+        }

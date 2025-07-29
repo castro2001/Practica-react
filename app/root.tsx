@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Header } from "./Components/Layout/Header/Header";
 import { SideBar } from "./Components/Layout/SideBar/SideBar";
+import { useState } from "react";
 
 
 export const links: Route.LinksFunction = () => [
@@ -27,6 +28,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+    
+const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <html lang="en">
       <head>
@@ -37,9 +40,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex min-h-screen ">
 
-        <SideBar/>
+        <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
         <div className="flex flex-col flex-grow overflow-hidden">
-          <Header/>
+          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
         <main className="p-4 h-full">
           {children}
         </main>
