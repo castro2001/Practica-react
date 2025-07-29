@@ -11,7 +11,8 @@ export const DataGrid = (props: IDataGrid)=> {
 
   return (
     <>
-    <DataHeader 
+   <div className="mx-auto ">
+     <DataHeader 
       title={title}
       btn_text={btn_text} 
       isSearch={isSearch} 
@@ -22,6 +23,7 @@ export const DataGrid = (props: IDataGrid)=> {
     
     />
     <DataPaginator />
+   </div>
     
     </>
     

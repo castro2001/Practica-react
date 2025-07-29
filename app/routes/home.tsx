@@ -12,7 +12,8 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   const iDataHeader:IDataHeader ={
-    title: ""
+    title: "Bandeja de Entrada",
+    btn_text:"Redactar"
   } 
 
 
