@@ -34,7 +34,7 @@ export const SideBar = (props: IActionSideBar) => {
     return (
         <>
             <aside
-                className={`bg-white dark:bg-gray-800 overflow-hidden h-screen flex-shrink-0 relative z-20 transition-all duration-300 ease-in-out group ${
+                className={`bg-white dark:bg-gray-800 overflow-hidden min-h-screen flex-shrink-0 relative z-20 transition-all duration-300 ease-in-out group ${
                     sidebarOpen ? "w-64" : "w-16"
                 }`}
                 onMouseEnter={() => !sidebarOpen && setSidebarOpen(true)}

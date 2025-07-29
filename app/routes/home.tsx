@@ -1,6 +1,7 @@
 import { Welcome } from "~/Components/Welcome/Welcome";
 import type { Route } from "./+types/home";
 import { icons } from "lucide-react";
+import DataGrid from "~/Components/DataGrid/DataGrid";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,10 +15,16 @@ export default function Home() {
     
   } 
 
-  return <Welcome 
-  title="Bienvenido Jordan"
-  isIcon = {false}
-  descripcion={description}
+  return (
+    <>
+    <DataGrid />    
+    </>
+  )
   
-  />;
+  // <Welcome 
+  // title="Bienvenido Jordan"
+  // isIcon = {false}
+  // descripcion={description}
+  
+  ;
 }

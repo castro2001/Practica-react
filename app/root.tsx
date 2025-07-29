@@ -12,6 +12,7 @@ import "./app.css";
 import { Header } from "./Components/Layout/Header/Header";
 import { SideBar } from "./Components/Layout/SideBar/SideBar";
 import { useState } from "react";
+import { Breadcrumb } from "./Components/Breadcrumb/Breadcrumb";
 
 
 export const links: Route.LinksFunction = () => [
@@ -43,6 +44,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
         <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
         <div className="flex flex-col flex-grow overflow-hidden">
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+          {/* <Breadcrumb /> */}
         <main className="p-4 h-full">
           {children}
         </main>

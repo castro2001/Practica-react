@@ -153,7 +153,7 @@ export const Header = (props: IActionSideBar)=>{
                 </button>
                 {/* <h2 className="text-[10px]  font-semibold text-gray-800 dark:text-gray-100 ml-3">Bandeja de Entrada</h2> */}
             </div>
-<div className="flex items-center gap-2 space-x-3">
+    <div className="flex items-center gap-2 space-x-3">
     {/* Notificaciones */}
     <div className="relative">
         <button 
