@@ -1,7 +1,7 @@
 interface IDataGrid{
     dataHeader: IDataHeader;
     dataBody: IDataBody;
-    dataPaginator: IDataPaginator;
+    dataPaginator: IDataPaginatorConfig;
 }
 
 
@@ -10,24 +10,35 @@ interface IDataHeader{
     btn_text?:string;
     isSearch?:boolean;
     isUpdate?:boolean;
+      terminoBusqueda?: string;
+      setTerminoBusqueda?: (termino: string) => void;
+
 }
 
-
+interface IDataPaginatorConfig {
+    pagina?: number; // Elementos por página (opcional, default 5)
+}
 interface IDataBody{
     data?: IProduct[];
-    buscador:string;
+    terminoBusqueda?: string;
+    totalElementos?: number;
+     isStarred?: boolean;
+  isDraft?: boolean;
+  isRead?: boolean;
+  isArchived?: boolean;
 }
+
 
 
 interface IDataPaginator{
-    pagina:number;
-    paginaActual: number;
-    setPaginaActual: (number : number) => number;
-    
-    dataFiltrada: IProduct[];
-    setDataFiltrada: (data: IProduct[])=>void;
+     pagina: number;
+  paginaActual: number;
+  setPaginaActual: (pagina: number) => void;
+  totalElementos: number;
+  totalPaginas: number;
 
 }
+
 
 interface IProduct{
     id:number;

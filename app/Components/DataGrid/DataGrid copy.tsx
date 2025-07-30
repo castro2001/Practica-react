@@ -337,3 +337,197 @@ export default function DataGrid() {
     </div>
   );
 }
+
+// ===== VERSIÓN ALTERNATIVA CON CARDS COMPLETAS =====
+
+export const DataBodyCards = (props: IDataBody) => {
+  const { data = [], terminoBusqueda = '', totalElementos = 0 } = props;
+
+  const obtenerMensajeVacio = () => {
+    if (terminoBusqueda.trim()) {
+      return `No se encontraron resultados para "${terminoBusqueda}".`;
+    }
+    return 'No hay elementos disponibles.';
+  };
+
+  return (
+    <div className="bg-gray-50">
+      {data && data.length > 0 ? (
+        <div className="p-4">
+          {/* GRID RESPONSIVO */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {data.map((product: IProduct) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
+              >
+                {/* Imagen del producto */}
+                <div className="relative">
+                  <img
+                    alt="Product"
+                    className="w-full h-40 sm:h-48 object-cover"
+                    src={product.images?.[0] || '/placeholder-image.jpg'}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                    }}
+                  />
+                  <div className="absolute top-2 left-2">
+                    <span className="px-2 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
+                      NUEVO
+                    </span>
+                  </div>
+                  <div className="absolute top-2 right-2 flex space-x-2">
+                    <button className="p-1.5 bg-white/80 hover:bg-white text-gray-600 hover:text-yellow-500 rounded-full transition-colors">
+                      <Star className="h-4 w-4" />
+                    </button>
+                    <button className="p-1.5 bg-white/80 hover:bg-white text-gray-600 rounded-full transition-colors">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Contenido de la card */}
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      {product.category?.name || 'General'}
+                    </span>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                  </div>
+                  
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
+                    {product.title}
+                  </h3>
+                  
+                  <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+                    {product.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-blue-600">
+                      ${product.price}
+                    </span>
+                    <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md transition-colors">
+                      Ver más
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-12 px-4 text-gray-500">
+          <div className="mb-2 text-base sm:text-lg">
+            {obtenerMensajeVacio()}
+          </div>
+          {terminoBusqueda && (
+            <div className="text-sm text-gray-400">
+              Intenta con otros términos de búsqueda
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ===== VERSIÓN CON LISTA COMPACTA PARA MÓVIL =====
+
+export const DataBodyCompact = (props: IDataBody) => {
+  const { data = [], terminoBusqueda = '', totalElementos = 0 } = props;
+
+  const obtenerMensajeVacio = () => {
+    if (terminoBusqueda.trim()) {
+      return `No se encontraron resultados para "${terminoBusqueda}".`;
+    }
+    return 'No hay elementos disponibles.';
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-800">
+      {data && data.length > 0 ? (
+        <div className="divide-y  dark:bg-gray-800 divide-gray-100">
+          {data.map((product: IProduct) => (
+            <div 
+              key={product.id} 
+              className="p-3 sm:p-4 hover:bg-gray-50 transition-colors duration-150"
+            >
+              <div className="flex items-start space-x-3">
+                {/* Checkbox y estrella */}
+                <div className="flex items-center space-x-2 pt-1">
+                  <input
+                    type="checkbox"
+                    className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                  />
+                  <button className="text-gray-400 hover:text-yellow-500 transition-colors duration-150 hidden sm:block">
+                    <Star className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                {/* Imagen */}
+                <img
+                  alt="Product"
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover flex-shrink-0"
+                  src={product.images?.[0] || '/placeholder-image.jpg'}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/placeholder-image.jpg';
+                  }}
+                />
+
+                {/* Contenido */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-xs sm:text-sm font-semibold text-gray-900 truncate">
+                          {product.category?.name || 'General'}
+                        </span>
+                        <span className="px-1.5 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded">
+                          NUEVO
+                        </span>
+                      </div>
+                      <h3 className="text-sm sm:text-base font-medium text-gray-900 mb-1 line-clamp-1">
+                        {product.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 mb-2">
+                        {product.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-base sm:text-lg font-bold text-blue-600">
+                          ${product.price}
+                        </span>
+                        <span className="text-xs text-gray-500 sm:hidden">
+                          ID: {product.id}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Menú de opciones */}
+                    <button className="p-1.5 ml-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 px-4 text-gray-500">
+          <div className="mb-2 text-base sm:text-lg">
+            {obtenerMensajeVacio()}
+          </div>
+          {terminoBusqueda && (
+            <div className="text-sm text-gray-400">
+              Intenta con otros términos de búsqueda
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
