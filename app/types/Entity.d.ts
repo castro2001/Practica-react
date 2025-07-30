@@ -1,12 +1,12 @@
-interface IDataGrid{
+interface IDataGrid<T>{
     dataHeader: IDataHeader;
-    dataBody: IDataBody;
+    dataBody: IDataBody<T>;
     dataPaginator: IDataPaginatorConfig;
 }
 
 
 interface IDataHeader{
-    title: string;
+    title?: string;
     btn_text?:string;
     isSearch?:boolean;
     isUpdate?:boolean;
@@ -18,14 +18,16 @@ interface IDataHeader{
 interface IDataPaginatorConfig {
     pagina?: number; // Elementos por página (opcional, default 5)
 }
-interface IDataBody{
-    data?: IProduct[];
+interface IDataBody <T>{
+    data?: T[];
     terminoBusqueda?: string;
     totalElementos?: number;
-     isStarred?: boolean;
-  isDraft?: boolean;
-  isRead?: boolean;
-  isArchived?: boolean;
+    isStarred?: boolean;
+    isDraft?: boolean;
+    isRead?: boolean;
+    isArchived?: boolean;
+    renderDesktop: (item: T) => React.ReactNode;
+  renderMovil: (item: T) => React.ReactNode;
 }
 
 
@@ -40,24 +42,3 @@ interface IDataPaginator{
 }
 
 
-interface IProduct{
-    id:number;
-    title:string;
-    slug:string
-    price:number;
-    description:string;
-    category: Category;
-    images: string[]
-    creationAt: Date;
-    updateAt: Date;
-}
-
-
-interface Category{
-    id:number;
-    name:string;
-    slug:string;
-    image:string;
-    creationAt: Date;
-    updateAt: Date;
-}

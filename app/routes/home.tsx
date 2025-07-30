@@ -1,8 +1,6 @@
 import { Welcome } from "~/Components/Welcome/Welcome"; 
 import type { Route } from "./+types/home"; 
-import { icons } from "lucide-react"; 
-import { DataGrid } from "~/Components/DataGrid/DataGrid"; 
-import { useFetch } from "~/hook/useFetchHook";  
+import Logo from "~/assets/image/logo.png";
 
 export function meta({}: Route.MetaArgs) {   
     return [     
@@ -11,50 +9,18 @@ export function meta({}: Route.MetaArgs) {
     ]; 
 }  
 
-export default function Home() {    
-    const { data, errors, isLoading } = useFetch("https://api.escuelajs.co/api/v1/products");    
-    
-    // ✅ Verificar que data existe y es un array antes de usar map
-    const productos: IProduct[] = data || [];
-    
-    
-    const iDataHeader: IDataHeader = {     
-      title: "Bandeja de Entrada",     
-      btn_text: "Redactar",
-        isSearch: true,
-    }     
-    const iDataBody: IDataBody = {data: productos}
-    
-    const descripcion: IDescription = {        
-    }   
+export default function Home() {  
+    const iWelcome : IWelcome= {
+        title:"Bienvenido Usuario",
+        descripcion:{
+            content:"Bienvenido Usuario este es un proyecto de prueba, Se saca provecho a react  convirtiendo a un componente lo mas reutilizable posible"
+        },
+        image:Logo
+    }  
 
-    const iDataPagintor: IDataPaginatorConfig = {     
-        pagina: 5   
-        
-    };
-    
-    // ✅ Mostrar estados de carga y error
-    if (isLoading) {
-        return <div>Cargando productos...</div>;
-    }
-    
-    if (errors) {
-        return <div>Error al cargar productos: {errors.message}</div>;
-    }
-    
     return (     
-        <>     
-            <DataGrid           
-                dataHeader={iDataHeader}     
-                dataBody={iDataBody}     
-                dataPaginator={iDataPagintor}     
-            />     
-                    
-            {/* <Welcome    
-                title="Bienvenido Jordan"   
-                isIcon={false}   
-                descripcion={descripcion}   
-            />      */}
+        <>                     
+            <Welcome  {...iWelcome}/>      
         </>   
     );        
 }

@@ -1,18 +1,20 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState,useRef } from "react"
 
-interface IResponse{
-    data: IProduct[] | null;
+interface IResponse <T>{
+    data: T[] | null;
     isLoading: boolean;
     errors: any;
 }
 
-export const useFetch = (url: string) => {
+export const useFetch = <T>(url: string) => {
     // ✅ Inicializar el estado con valores por defecto
-    const [state, setState] = useState<IResponse>({
+    const [state, setState] = useState<IResponse<T>>({
         data: null,
         isLoading: true,
         errors: null
     });
+const abortController = useRef<AbortController | null>(null);
+  const hasFetched = useRef(false); // 🔒 evita doble llamada incluso en Strict Mode
 
     const getFetch = async () => {
         // ✅ Establecer loading antes de la petición
@@ -36,7 +38,9 @@ export const useFetch = (url: string) => {
                 isLoading: false,
                 errors: null
             });
-        } catch (error) {
+        } catch (error:any) {
+                // ⚠️ Evita setState si fue abortado
+        if (error.name === "AbortError") return;
             setState({
                 data: null,
                 isLoading: false,
@@ -46,7 +50,9 @@ export const useFetch = (url: string) => {
     }
     
     useEffect(() => {
-        if (!url) return;
+        if (!url || hasFetched.current) return;
+        abortController.current = new AbortController();
+        const signal = abortController.current.signal;
         getFetch();
     }, [url]);
 

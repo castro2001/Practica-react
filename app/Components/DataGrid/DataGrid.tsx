@@ -4,9 +4,9 @@ import { DataHeader } from './DataHeader/DataHeader';
 import { DataBody } from './DataBody/DataBody';
 import { DataPaginator } from './DataPaginator/DataPaginator';
 
-export const DataGrid = (props: IDataGrid) => {
+export const DataGrid = <T,> (props: IDataGrid<T> ) => {
   const { dataHeader, dataBody, dataPaginator } = props;
-  const { title, btn_text, isSearch, isUpdate } = dataHeader;
+  // const { title, btn_text, isSearch, isUpdate } = dataHeader;
   const { data = [] } = dataBody;
   const { pagina = 5 } = dataPaginator;
 
@@ -56,21 +56,8 @@ export const DataGrid = (props: IDataGrid) => {
 
   return (
     <div className="container mx-auto max-w-6xl rounded-lg shadow-lg overflow-hidden">
-      <DataHeader 
-        title={title}
-        btn_text={btn_text} 
-        isSearch={isSearch} 
-        isUpdate={isUpdate}
-        terminoBusqueda={terminoBusqueda}
-        setTerminoBusqueda={setTerminoBusqueda}
-      />
-      
-      <DataBody 
-        data={dataPaginada} // Solo pasamos los datos de la página actual
-        terminoBusqueda={terminoBusqueda}
-        totalElementos={totalElementos}
-      />
-      
+      <DataHeader {... dataHeader}/>
+      <DataBody  {...dataBody} /> 
       {totalElementos > pagina && (
         <DataPaginator 
           pagina={pagina}

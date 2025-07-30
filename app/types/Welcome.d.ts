@@ -2,7 +2,7 @@ interface IWelcome{
     title:string,
     descripcion:IDescription;
     image?:string;
-    isIcon:boolean;
+    isIcon?:boolean;
 }
 
 interface IDescription{
