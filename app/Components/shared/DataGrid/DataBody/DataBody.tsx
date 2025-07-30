@@ -1,57 +1,122 @@
-
-
+import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import React from 'react';
 
   export const DataBody = <T,> (props: IDataBody<T>) => {
-    const { data = [], 
+    const { 
+      data = [], 
       terminoBusqueda = '', 
       totalElementos = 0,
       actions,
       renderDesktop,
-      renderMovil 
+      renderMovil ,
+       isLoading = false,
+    errors
     } = props;
       
       console.log("Obteniendo datos de forma generica con T",data)
-    const obtenerMensajeVacio = () => {
-      if (terminoBusqueda.trim()) {
-        return `No se encontraron resultados para "${terminoBusqueda}".`;
-      }
-      return 'No hay elementos disponibles.';
-    };
-
-    return (
-      <>
+   // Componente de Loading
+   const LoadingComponent = () => (
+     <div className="bg-white dark:bg-gray-800">
+       <div className="flex flex-col items-center justify-center py-16 px-4">
+         <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+           Cargando datos...
+         </h3>
+         <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm">
+           Por favor espera mientras obtenemos la información más reciente.
+         </p>
+         
+         {/* Skeleton loading para dar feedback visual */}
+         <div className="w-full max-w-4xl mt-8 space-y-4">
+           {[1, 2, 3, 4, 5].map((i) => (
+             <div key={i} className="animate-pulse flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+               <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+               <div className="flex-1 space-y-2">
+                 <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
+                 <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
+               </div>
+               <div className="w-20 h-6 bg-gray-300 dark:bg-gray-600 rounded"></div>
+             </div>
+           ))}
+         </div>
+       </div>
+     </div>
+   );
+ 
+   // Componente de Error
+   const ErrorComponent = () => (
+     <div className="bg-white dark:bg-gray-800">
+       <div className="flex flex-col items-center justify-center py-16 px-4">
+         <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
+           <AlertCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+         </div>
+         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+           Error al cargar los datos
+         </h3>
+         <p className="text-sm text-gray-500 dark:text-gray-400 text-center max-w-sm mb-6">
+           {errors?.message || 'Ha ocurrido un error inesperado. Por favor, intenta nuevamente.'}
+         </p>
+         <button 
+           onClick={() => window.location.reload()}
+           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+         >
+           <RefreshCw className="w-4 h-4" />
+           <span>Reintentar</span>
+         </button>
+       </div>
+     </div>
+   );
+ 
+   // Componente de Empty State
+   const EmptyComponent = () => {
+     const obtenerMensajeVacio = () => {
+       if (terminoBusqueda.trim()) {
+         return `No se encontraron resultados para "${terminoBusqueda}".`;
+       }
+       return 'No hay elementos disponibles.';
+     };
+ 
+     return (
        <div className="bg-white dark:bg-gray-800">
-        {
-          data && data.length > 0 ? (
-            <div className="divide-y divide-gray-100">
-                    {data.map((item, index) => (
-              <div key={index} className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                <div className="hidden md:block">{renderDesktop(item,actions!)}</div>
-                <div className="block md:hidden">{renderMovil(item,actions!)}</div>
-              </div>
-              ))}
-
-            </div>
-          ):
-          (
-          <div className="text-center py-12 px-4 text-gray-500 dark:text-gray-200">
-            
-            <div className="mb-2 text-base sm:text-lg">
-              {obtenerMensajeVacio()}
-            </div>
-
-              {terminoBusqueda && (
-                <div className="text-sm text-gray-400 dark:text-gray-200">
-                  Intenta con otros términos de búsqueda
-                </div>
-              )}
-          </div>
-          )
-        
-        }
-      </div> 
-     
-     </>
-    );
+         <div className="text-center py-12 px-4 text-gray-500 dark:text-gray-200">
+           <div className="mb-2 text-base sm:text-lg">
+             {obtenerMensajeVacio()}
+           </div>
+           {terminoBusqueda && (
+             <div className="text-sm text-gray-400 dark:text-gray-200">
+               Intenta con otros términos de búsqueda
+             </div>
+           )}
+         </div>
+       </div>
+     );
+   };
+ 
+   // Renderizado condicional basado en el estado
+   if (isLoading) {
+     return <LoadingComponent />;
+   }
+ 
+   if (errors) {
+     return <ErrorComponent />;
+   }
+ 
+   if (!data || data.length === 0) {
+     return <EmptyComponent />;
+   }
+ 
+   // Renderizado normal de datos
+   return (
+     <div className="bg-white dark:bg-gray-800">
+       <div className="divide-y divide-gray-100">
+         {data.map((item, index) => (
+           <div key={index} className="border-b border-gray-200 dark:border-gray-700">
+             <div className="hidden md:block">{renderDesktop(item, actions!)}</div>
+             <div className="block md:hidden">{renderMovil(item, actions!)}</div>
+           </div>
+         ))}
+       </div>
+     </div> 
+   );
   };
 

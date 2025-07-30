@@ -1,13 +1,12 @@
-// DataGrid.tsx - Componente principal con lógica centralizada
 import React, { useState, useEffect, useMemo } from 'react';
 import { DataHeader } from './DataHeader/DataHeader';
 import { DataBody } from './DataBody/DataBody';
 import { DataPaginator } from './DataPaginator/DataPaginator';
 
 export const DataGrid = <T,> (props: IDataGrid<T> ) => {
-  const { dataHeader, dataBody, dataPaginator } = props;
-  // const { title, btn_text, isSearch, isUpdate } = dataHeader;
-  const { data = [] } = dataBody;
+  const { dataHeader, dataBody, dataPaginator ,filterConfig} = props;
+  const {title,btn_text,isSearch,isUpdate} = dataHeader;
+  const { data = [] ,renderDesktop,renderMovil,isLoading,errors} = dataBody;
   const { pagina = 5 } = dataPaginator;
 
   // Estados centralizados
@@ -15,35 +14,69 @@ export const DataGrid = <T,> (props: IDataGrid<T> ) => {
   const [paginaActual, setPaginaActual] = useState(1);
   const [filtrosActivos, setFiltrosActivos] = useState({});
 
-  // Datos filtrados por búsqueda y filtros (sin paginar)
-  const dataFiltrada = useMemo(() => {
-    let resultado = [...data];
-
-    // Aplicar búsqueda
-    if (terminoBusqueda.trim()) {
-      resultado = resultado.filter((item: any) =>
-        item.title?.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-        item.description?.toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
-        item.category?.name?.toLowerCase().includes(terminoBusqueda.toLowerCase())
-      );
+    // ✅ Función de filtrado dinámico
+  const aplicarFiltrosDinamicos = (items: T[], searchTerm: string): T[] => {
+    if (!searchTerm.trim() || !filterConfig) {
+      return items;
     }
 
-    // Aplicar filtros adicionales aquí si es necesario
-    // Object.keys(filtrosActivos).forEach(key => {
-    //   if (filtrosActivos[key]) {
-    //     resultado = resultado.filter(item => item[key] === filtrosActivos[key]);
-    //   }
-    // });
+    // Si hay una función de filtro personalizada, usarla
+    if (filterConfig.customFilter) {
+      return items.filter(item => filterConfig.customFilter!(item, searchTerm));
+    }
 
+    // Si no, usar los campos configurados
+    const searchLower = searchTerm.toLowerCase();
+    return items.filter(item => {
+      return filterConfig.searchFields.some(field => {
+        const fieldValue = item[field];
+        if (fieldValue == null) return false;
+        
+        // Manejar diferentes tipos de datos
+        if (typeof fieldValue === 'string') {
+          return fieldValue.toLowerCase().includes(searchLower);
+        }
+        
+        if (typeof fieldValue === 'number') {
+          return fieldValue.toString().includes(searchTerm);
+        }
+        
+        // Para objetos anidados (como category.name)
+        if (typeof fieldValue === 'object' && fieldValue !== null) {
+          return JSON.stringify(fieldValue).toLowerCase().includes(searchLower);
+        }
+        
+        return false;
+      });
+    });
+  };
+
+// Datos filtrados por búsqueda y filtros (sin paginar)
+  const dataFiltrada = useMemo(() => {
+    // Si está cargando o hay errores, no filtramos
+    if (isLoading || errors || !data.length) {
+      return [];
+    }
+
+    let resultado = [...data];
+
+    // ✅ Aplicar filtros dinámicos
+    if (terminoBusqueda.trim() && filterConfig) {
+      resultado = aplicarFiltrosDinamicos(resultado, terminoBusqueda);
+    }
     return resultado;
-  }, [data, terminoBusqueda, filtrosActivos]);
+  }, [data, terminoBusqueda, filtrosActivos, isLoading, errors, filterConfig]);
 
   // Datos paginados (solo los elementos de la página actual)
   const dataPaginada = useMemo(() => {
+    if (isLoading || errors) {
+      return [];
+    }
+
     const indiceInicio = (paginaActual - 1) * pagina;
     const indiceFin = indiceInicio + pagina;
     return dataFiltrada.slice(indiceInicio, indiceFin);
-  }, [dataFiltrada, paginaActual, pagina]);
+  }, [dataFiltrada, paginaActual, pagina, isLoading, errors]);
 
   // Resetear página cuando cambian los filtros o búsqueda
   useEffect(() => {
@@ -54,20 +87,38 @@ export const DataGrid = <T,> (props: IDataGrid<T> ) => {
   const totalElementos = dataFiltrada.length;
   const totalPaginas = Math.ceil(totalElementos / pagina);
 
-  return (
-    <div className="container mx-auto max-w-6xl rounded-lg shadow-lg overflow-hidden">
-      <DataHeader {... dataHeader}/>
-      <DataBody  {...dataBody} /> 
-      {totalElementos > pagina && (
-        <DataPaginator 
-          pagina={pagina}
-          paginaActual={paginaActual} 
-          setPaginaActual={setPaginaActual} 
-          totalElementos={totalElementos}
-          totalPaginas={totalPaginas}
-        />
-      )}
+  const dataheader:IDataHeader = {
+    title:title,
+    btn_text: btn_text, 
+    isSearch: isSearch ,
+    isUpdate : isUpdate,
+    terminoBusqueda:terminoBusqueda,
+    setTerminoBusqueda:setTerminoBusqueda
+  }
 
+  const databody: IDataBody<T> = {
+    data:dataPaginada, // Solo pasamos los datos de la página actual
+    terminoBusqueda:terminoBusqueda,
+    totalElementos:totalElementos ,
+    renderDesktop:renderDesktop ,
+    renderMovil:renderMovil,
+    isLoading:isLoading,
+    errors:errors
+  }
+
+  const datapaginator: IDataPaginator={
+    pagina:pagina,
+    paginaActual:paginaActual, 
+    setPaginaActual:setPaginaActual, 
+    totalElementos:totalElementos,
+    totalPaginas:totalPaginas,
+  }
+
+  return (
+    <div className="container mx-auto  rounded-lg shadow-lg overflow-hidden">
+      <DataHeader {...dataheader} />
+      <DataBody {...databody} /> 
+      {totalElementos > pagina && (<DataPaginator {...datapaginator}/>)}
     </div>
   );
 };

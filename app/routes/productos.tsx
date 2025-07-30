@@ -22,6 +22,19 @@ export default function Productos() {
         isDraft:false,
         isRead:false
     }
+// ✅ Configuración de filtros para usuarios
+  const productosFilterConfig: IFilterConfig<IProduct> = {
+   
+    // O usar filtro personalizado:
+    customFilter: (producto, searchTerm) => {
+       const term = searchTerm.toLowerCase();
+       return producto.title?.toLowerCase().includes(term) ||
+             producto.category?.name.toLowerCase().includes(term) ||
+             producto.description.toLowerCase().includes(term);
+            //  usuario.id?.toString().includes(searchTerm);
+     }
+  };
+
     
     const IdataGridProps : IDataGrid<IProduct> ={
         dataHeader:{
@@ -31,6 +44,8 @@ export default function Productos() {
         },
         dataBody:{
             data:productos,
+              isLoading:isLoading,
+            errors:errors,
                 renderDesktop: (product) => (
                     <PageProductosDesktop  product={product}  actions={actions} />
                 ),
@@ -40,16 +55,8 @@ export default function Productos() {
         },
         dataPaginator:{
             pagina:5
-        }
-    }
-    
-    // ✅ Mostrar estados de carga y error
-    if (isLoading) {
-        return <div>Cargando productos...</div>;
-    }
-    
-    if (errors) {
-        return <div>Error al cargar productos: {errors.message}</div>;
+        },
+        filterConfig:productosFilterConfig
     }
     
     return (     
