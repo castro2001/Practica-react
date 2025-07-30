@@ -1,4 +1,5 @@
 import { MoreHorizontal, Star } from "lucide-react";
+import { useNavigate } from "react-router";
   import BackgroundDefault from "~/assets/image/background_default.png"
 import { formatearFecha } from "~/utils/formatoFecha";
 
@@ -9,15 +10,21 @@ import { formatearFecha } from "~/utils/formatoFecha";
 export const PageUsuarioDesktop :React.FC<PageProductosDesktopProps> = ({ usuario, actions }) =>{
 // = (props: IUsuarios)
 
-    const {email,password,name,role,avatar,creationAt,updateAt} = usuario;
+    const {id,email,password,name,role,avatar,creationAt,updateAt} = usuario;
       const { isStarred, isArchived, isDraft, isRead } = actions;
+
+       const navigate = useNavigate();
+    
+      const handleClick=()=>{
+        navigate(`/Detalle/Usuario/${id}`, { state: { usuario } }); // ✅ Navegación con estado
+      }
     return (
         <>
   <div className="flex items-center space-x-4">
         <span className="font-bold text-gray-500">{role}</span>
       </div>
 
-      <div className="hidden md:flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-4 cursor-pointer" onClick={handleClick}>
         <input
           type="checkbox"
           className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 flex-shrink-0"

@@ -3,9 +3,10 @@ interface IWelcome{
     descripcion:IDescription;
     image?:string;
     isIcon?:boolean;
+      secondImage?: string | null; // ✅ Nuevo campo
 }
 
 interface IDescription{
-    content?:string;
+    content?:string | React.ReactNode;
     icon?:React.ReactNode
 }

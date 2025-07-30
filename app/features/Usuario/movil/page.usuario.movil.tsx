@@ -1,13 +1,18 @@
 import { MoreHorizontal, Star } from "lucide-react";
+import { useNavigate } from "react-router";
   import BackgroundDefault from "~/assets/image/background_default.png"
 import { formatearFecha } from "~/utils/formatoFecha";
 export const PageUsuarioMovil = (props: IUsuarios)=>{
       const {id,email,password,name,role,avatar,creationAt,updateAt} = props;
 
-
+ const navigate = useNavigate();
+    
+      const handleClick=()=>{
+        navigate(`/Detalle/Usuario/${id}`, { state: { props } }); // ✅ Navegación con estado
+      }
     return (
         <>
-                            <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
                         <input
                         type="checkbox"
@@ -26,7 +31,7 @@ export const PageUsuarioMovil = (props: IUsuarios)=>{
                 </div>
 
                 {/* Contenido principal */}
-                <div className="flex space-x-3">
+            <div className="flex space-x-3" onClick={handleClick}>
                 <img
                     alt="Product"
                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover flex-shrink-0"

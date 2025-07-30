@@ -1,9 +1,14 @@
 import { MoreHorizontal, Star } from "lucide-react";
+import { useNavigate } from "react-router";
   import BackgroundDefault from "~/assets/image/background_default.png"
 
 export const PageProductosMovil = (props: IProduct)=>{
     const {id,title,slug,price,description,category,images,creationAt,updateAt} = props;
+     const navigate = useNavigate();
     
+      const handleClick=()=>{
+    navigate(`/Detalle/Productos/${id}`, { state: { props } }); // ✅ Navegación con estado
+      }
     return (
         <>
                 <div className="flex items-center justify-between mb-3">
@@ -25,7 +30,7 @@ export const PageProductosMovil = (props: IProduct)=>{
                 </div>
 
                 {/* Contenido principal */}
-                <div className="flex space-x-3">
+            <div className="flex space-x-3 cursor-pointer" onClick={handleClick}>
                 <img
                     alt="Product"
                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover flex-shrink-0"

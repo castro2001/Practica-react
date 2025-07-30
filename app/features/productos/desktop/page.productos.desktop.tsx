@@ -1,6 +1,6 @@
 import { MoreHorizontal, Star } from "lucide-react";
-  import BackgroundDefault from "~/assets/image/background_default.png"
-
+import BackgroundDefault from "~/assets/image/background_default.png"
+import { useNavigate } from "react-router";
 
   interface PageProductosDesktopProps {
   product: IProduct;
@@ -11,6 +11,12 @@ import { MoreHorizontal, Star } from "lucide-react";
 export const PageProductosDesktop: React.FC<PageProductosDesktopProps> = ({ product, actions }) => {
   const { id, title, slug, price, description, category, images, creationAt, updateAt } = product;
   const { isStarred, isArchived, isDraft, isRead } = actions;
+  const navigate = useNavigate();
+
+  const handleClick=()=>{
+    navigate(`/Detalle/Productos/${id}`, { state: { product } }); // ✅ Navegación con estado
+  }
+
 
   return (
     <>
@@ -18,7 +24,7 @@ export const PageProductosDesktop: React.FC<PageProductosDesktopProps> = ({ prod
         <span className="font-bold text-gray-500">{title}</span>
       </div>
 
-      <div className="hidden md:flex items-center space-x-4">
+      <div className="hidden md:flex items-center space-x-4 cursor-pointer" onClick={handleClick}>
         <input
           type="checkbox"
           className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 flex-shrink-0"
