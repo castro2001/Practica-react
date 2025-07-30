@@ -1,18 +1,11 @@
-  import { Clock, MoreHorizontal, Star } from 'lucide-react';
-  import React, { useState } from 'react';
-  import BackgroundDefault from "~/assets/image/background_default.png"
-import { DataBodyDesktop } from './view/DataBody.desktop';
-import { DataBodyMovil } from './view/DataBody.movil';
+
 
 
   export const DataBody = <T,> (props: IDataBody<T>) => {
     const { data = [], 
       terminoBusqueda = '', 
       totalElementos = 0,
-      isStarred,
-      isDraft,
-      isArchived,
-      isRead ,
+      actions,
       renderDesktop,
       renderMovil 
     } = props;
@@ -29,16 +22,16 @@ import { DataBodyMovil } from './view/DataBody.movil';
       <>
        <div className="bg-white dark:bg-gray-800">
         {
-          data && data.length >0 ? (
-            <>
-              {data.map((item, index) => (
-              <div key={index} className="border-b border-gray-200 dark:border-gray-700">
-                <div className="hidden md:block">{renderDesktop(item)}</div>
-                <div className="block md:hidden">{renderMovil(item)}</div>
+          data && data.length > 0 ? (
+            <div className="divide-y divide-gray-100">
+                    {data.map((item, index) => (
+              <div key={index} className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                <div className="hidden md:block">{renderDesktop(item,actions!)}</div>
+                <div className="block md:hidden">{renderMovil(item,actions!)}</div>
               </div>
               ))}
 
-            </>
+            </div>
           ):
           (
           <div className="text-center py-12 px-4 text-gray-500 dark:text-gray-200">

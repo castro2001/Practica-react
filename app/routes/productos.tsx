@@ -15,6 +15,13 @@ export default function Productos() {
     const { data, errors, isLoading } = useFetch<IProduct>("https://api.escuelajs.co/api/v1/products");    
     // ✅ Verificar que data existe y es un array antes de usar map
     const productos: IProduct[] = data || [];
+
+    const actions:IActionsDataBody = {
+        isStarred: true,
+        isArchived:false,
+        isDraft:false,
+        isRead:false
+    }
     
     const IdataGridProps : IDataGrid<IProduct> ={
         dataHeader:{
@@ -25,7 +32,7 @@ export default function Productos() {
         dataBody:{
             data:productos,
                 renderDesktop: (product) => (
-                    <PageProductosDesktop {... product} />
+                    <PageProductosDesktop  product={product}  actions={actions} />
                 ),
                 renderMovil: (product) => (
                <PageProductosMovil {... product} />

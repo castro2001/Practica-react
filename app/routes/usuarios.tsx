@@ -13,7 +13,12 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Usuarios() {
     const { data, errors, isLoading } = useFetch<IUsuarios>("https://api.escuelajs.co/api/v1/users");    
-    
+        const actions:IActionsDataBody = {
+        isStarred: true,
+        isArchived:false,
+        isDraft:false,
+        isRead:false
+    }
     // ✅ Verificar que data existe y es un array antes de usar map
     const usuarios: IUsuarios[] = data || [];
     
@@ -26,7 +31,7 @@ export default function Usuarios() {
         dataBody:{
             data:usuarios,
             renderDesktop: (usuarios) => (
-                <PageUsuarioDesktop {... usuarios} />
+                <PageUsuarioDesktop usuario={usuarios}  actions={actions} />
             ),
             
             renderMovil: (usuarios) => (

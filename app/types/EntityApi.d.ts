@@ -27,7 +27,7 @@ interface IUsuarios{
     name:string;
     role:string;
     avatar:string;
-    creationAt: Date;
-    updateAt: Date;
+    creationAt: string;
+    updateAt: string;
 
 }

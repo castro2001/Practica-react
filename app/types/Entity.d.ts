@@ -22,14 +22,17 @@ interface IDataBody <T>{
     data?: T[];
     terminoBusqueda?: string;
     totalElementos?: number;
-    isStarred?: boolean;
+    actions?: IActionsDataBody
+renderDesktop: (item: T,actions: IActionsDataBody ) => React.ReactNode;
+renderMovil: (item: T,actions: IActionsDataBody) => React.ReactNode;
+}
+
+interface IActionsDataBody{
+   isStarred?: boolean;
     isDraft?: boolean;
     isRead?: boolean;
     isArchived?: boolean;
-    renderDesktop: (item: T) => React.ReactNode;
-  renderMovil: (item: T) => React.ReactNode;
 }
-
 
 
 interface IDataPaginator{
