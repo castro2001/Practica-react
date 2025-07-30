@@ -1,6 +1,5 @@
 import { Upload } from "lucide-react";
 import BackgroundDefault from "~/assets/image/background_default.png"
-import Button from "~/Components/ui/Button";
 
 export const Welcome = (props: IWelcome)=>{
 
@@ -35,9 +34,7 @@ export const Welcome = (props: IWelcome)=>{
             <div className="flex items-center justify-center w-full h-96 lg:w-1/2">
                 <img className="object-cover w-full h-full mx-auto rounded-md lg:max-w-2xl" src={image} alt="glasses photo"/>
             </div>
-           <Button variant="outline" onClick={() => alert('Primary clicked')}>
-        <Upload className="h6 h4" />
-      </Button>
+      
         </div>
     </section>
 
