@@ -75,8 +75,8 @@ export const DataHeader = (props: IDataHeader)=> {
           placeholder={isLoading ? "Cargando..." : "Buscar productos..."}
           className={`block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
             isLoading 
-              ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed text-gray-400' 
-              : 'bg-white dark:bg-gray-800'
+              ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed  text-gray-700' 
+              : 'bg-white dark:bg-gray-800 text-gray-700'
           }`}
         />
       </div>

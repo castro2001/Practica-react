@@ -13,7 +13,7 @@ export const Header = (props: IActionSideBar)=>{
     const [isOpenPanel, setIsOpenPanel] = useState(false);
     const [isOpenPanelUser,setIsOpenPanelUser] = useState(false);
 
-  const content = (
+const notificationsPanel = (
   <>
     {/* NEW Section */}
     <div className="p-4">
@@ -73,9 +73,19 @@ export const Header = (props: IActionSideBar)=>{
     </div>
   
   </>
-  );
+);
 
-  const notificationsPanel = (
+
+
+  const panelUser = (
+    <>
+    <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mi Perfil</a>
+                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Configuración</a>
+                        <div className="border-t border-gray-100 dark:border-gray-700"></div>
+                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a>
+    </>
+  );
+   const mensajesModal = (
     <>        
         <div className="flex items-start space-x-3 mb-4 p-2 hover:bg-slate-700 rounded-lg transition-colors">
             <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-sm font-medium text-white">
@@ -91,45 +101,47 @@ export const Header = (props: IActionSideBar)=>{
                 </div>
             </div>
         </div>
-          <div className="flex items-start space-x-3 mb-4 p-2 hover:bg-slate-700 rounded-lg transition-colors">
-            <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-sm font-medium text-white">
-                AB
-            </div>
-            <div className="flex-1">
-                <p className="text-sm text-white">
-                <span className="font-medium">Nuevo mensaje recibido</span> Juan Pérez te ha enviado un mensaje
-                </p>
-                <div className="flex items-center mt-1">
-                    <span className="text-red-500 text-lg mr-2">❤️</span>
-                    <span className="text-xs text-slate-400">Hace 5 minutos</span>
-                </div>
-            </div>
-        </div>
-          <div className="flex items-start space-x-3 mb-4 p-2 hover:bg-slate-700 rounded-lg transition-colors">
-            <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-sm font-medium text-white">
-                AB
-            </div>
-            <div className="flex-1">
-                <p className="text-sm text-white">
-                <span className="font-medium">Nuevo mensaje recibido</span> Juan Pérez te ha enviado un mensaje
-                </p>
-                <div className="flex items-center mt-1">
-                    <span className="text-red-500 text-lg mr-2">❤️</span>
-                    <span className="text-xs text-slate-400">Hace 5 minutos</span>
-                </div>
-            </div>
-        </div>
+        
     </>
   );
 
-  const panelUser = (
-    <>
-    <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mi Perfil</a>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Configuración</a>
-                        <div className="border-t border-gray-100 dark:border-gray-700"></div>
-                        <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a>
-    </>
-  );
+  const modalNotificaciontes: IActionsModal={
+    isOpen:isOpenPanel,
+    onClose:() => setIsOpenPanel(false),
+    modalbody:{
+        title:"Notificaciones",
+        classNameContainer:"-right-1 w-80 ",
+        content:notificationsPanel,
+        redirect_Text:"Marcar todo como leído",
+        redirect:""
+    }        
+  }
+
+   const modalMensajes: IActionsModal={
+    isOpen:isOpen,
+    onClose:() => setIsOpen(false),
+    modalbody:{
+        title:"Mensajes Recibidos",
+        classNameContainer:"-right-20 w-80 ",
+        content:mensajesModal,
+        redirect_Text:"",
+        redirect:""
+    }        
+  }
+
+  const modalUsuarios: IActionsModal={
+    isOpen:isOpenPanelUser,
+    onClose:() => setIsOpenPanelUser(false),
+    modalbody:{
+        title:"Usuarios del Sistema",
+        classNameContainer:"-right-0 w-80 ",
+        content:panelUser,
+        redirect_Text:"",
+        redirect:""
+    }        
+  }
+
+
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -169,11 +181,7 @@ export const Header = (props: IActionSideBar)=>{
             </span>
         </button>
         
-        <ModalNotificaciones
-            isOpen={isOpenPanel}
-            onClose={() => setIsOpenPanel(false)}
-            content={notificationsPanel}
-        />
+        <ModalNotificaciones {...modalNotificaciontes}/>
     </div>
 
     {/* Mensajes */}
@@ -191,11 +199,7 @@ export const Header = (props: IActionSideBar)=>{
             </span>
         </button>
 
-        <ModalNotificaciones
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            content={content}
-        />
+        <ModalNotificaciones {...modalMensajes}/> 
     </div>
 
     {/* Botón de tema */}
@@ -220,11 +224,7 @@ export const Header = (props: IActionSideBar)=>{
             <img className="h-10 w-10 rounded-full object-cover" src={BackgroundDefault} alt="User Avatar"/>
         </button>
         
-        <ModalNotificaciones
-            isOpen={isOpenPanelUser}
-            onClose={() => setIsOpenPanelUser(false)}
-            content={panelUser}
-        />
+         <ModalNotificaciones {...modalUsuarios}       />
     </div>
 </div>
 

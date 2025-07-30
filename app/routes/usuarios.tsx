@@ -46,17 +46,14 @@ export default function Usuarios() {
             )
         },
         dataPaginator:{
-            pagina:5
+            pagina:3
         },
         filterConfig:usuariosFilterConfig
     }
     
-  
     return (     
         <>     
             <DataGrid  {...IdataGridProps} />     
         </>   
     ); 
-  
-  
 }

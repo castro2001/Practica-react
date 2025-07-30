@@ -4,7 +4,7 @@ import { DataBody } from './DataBody/DataBody';
 import { DataPaginator } from './DataPaginator/DataPaginator';
 
 export const DataGrid = <T,> (props: IDataGrid<T> ) => {
-  const { dataHeader, dataBody, dataPaginator ,filterConfig} = props;
+  const { dataHeader, dataBody, dataPaginator ,filterConfig } = props;
   const {title,btn_text,isSearch,isUpdate} = dataHeader;
   const { data = [] ,renderDesktop,renderMovil,isLoading,errors} = dataBody;
   const { pagina = 5 } = dataPaginator;
@@ -27,39 +27,35 @@ export const DataGrid = <T,> (props: IDataGrid<T> ) => {
 
     // Si no, usar los campos configurados
     const searchLower = searchTerm.toLowerCase();
-    return items.filter(item => {
-      return filterConfig.searchFields.some(field => {
-        const fieldValue = item[field];
-        if (fieldValue == null) return false;
-        
-        // Manejar diferentes tipos de datos
-        if (typeof fieldValue === 'string') {
-          return fieldValue.toLowerCase().includes(searchLower);
-        }
-        
-        if (typeof fieldValue === 'number') {
-          return fieldValue.toString().includes(searchTerm);
-        }
-        
-        // Para objetos anidados (como category.name)
-        if (typeof fieldValue === 'object' && fieldValue !== null) {
-          return JSON.stringify(fieldValue).toLowerCase().includes(searchLower);
-        }
-        
-        return false;
+      return items.filter(item => {
+        return filterConfig.searchFields.some(field => {
+          const fieldValue = item[field];
+          if (fieldValue == null) return false;
+          
+          // Manejar diferentes tipos de datos
+          if (typeof fieldValue === 'string') {
+            return fieldValue.toLowerCase().includes(searchLower);
+          }
+          
+          if (typeof fieldValue === 'number') {
+            return fieldValue.toString().includes(searchTerm);
+          }
+          
+          // Para objetos anidados (como category.name)
+          if (typeof fieldValue === 'object' && fieldValue !== null) {
+            return JSON.stringify(fieldValue).toLowerCase().includes(searchLower);
+          }
+    
+          return false;
+        });
       });
-    });
-  };
+    };
 
 // Datos filtrados por búsqueda y filtros (sin paginar)
   const dataFiltrada = useMemo(() => {
     // Si está cargando o hay errores, no filtramos
-    if (isLoading || errors || !data.length) {
-      return [];
-    }
-
+    if (isLoading || errors || !data.length)  return [];
     let resultado = [...data];
-
     // ✅ Aplicar filtros dinámicos
     if (terminoBusqueda.trim() && filterConfig) {
       resultado = aplicarFiltrosDinamicos(resultado, terminoBusqueda);

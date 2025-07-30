@@ -1,7 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 
 import "./ModalNotificaciones.css";
-export const ModalNotificaciones = ({ isOpen = false, onClose, content }: IActionsModal) => {
+export const ModalNotificaciones = (props: IActionsModal) => {
+  const {isOpen = false, onClose,modalbody} = props;
+
+  const {title="Notificaciones",content,classNameContainer="",
+    redirect_Text="Marcar todo como leído" ,redirect="/" } = modalbody
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,16 +32,17 @@ export const ModalNotificaciones = ({ isOpen = false, onClose, content }: IActio
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-2 z-50 w-80 bg-slate-800 rounded-lg shadow-2xl border border-slate-700"
+      className={`${classNameContainer} absolute  z-50 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-700`}
     >
       {/* Header del dropdown */}
       <div className="flex items-center justify-between p-4 border-b border-slate-700">
-        <h2 className="text-lg font-medium text-white">Notificaciones</h2>
+        <h2 className="text-lg font-medium text-white">{title}</h2>
         <button 
           className="text-blue-400 text-sm hover:text-blue-300 transition-colors"
           onClick={onClose}
+          
         >
-          Marcar todo como leído
+          {redirect_Text}
         </button>
       </div>
 

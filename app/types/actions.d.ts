@@ -1,7 +1,15 @@
 interface IActionsModal {
   isOpen: boolean;
   onClose: () => void;
+  modalbody: IActionModalBody;
+}
+
+interface IActionModalBody{
+  title:string;
   content?: React.ReactNode;
+  classNameContainer?:string;
+  redirect?:string;
+  redirect_Text:string;
 }
 
 interface IActionSideBar {
