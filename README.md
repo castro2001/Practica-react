@@ -4,6 +4,30 @@ A modern, production-ready template for building full-stack React applications u
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
 
+## Estructura 
+app/
+├── assets/                      # Imágenes, íconos, etc.
+├── components/                  # Componentes reutilizables
+│   ├── ui/                      # Botones, inputs, modales genéricos
+│   ├── shared/                  # Ej: DataGrid, Header, etc.
+│   └── layout/                  # Navbar, Sidebar, etc.
+├── features/                    # Agrupación por dominio funcional
+│   ├── productos/
+│   │   ├── components/          # Componentes específicos de productos (cards, forms)
+│   │   ├── pages/               # Páginas: desktop, móvil o detalle
+│   │   └── index.ts            # Lógica o hook general del módulo
+│   └── usuarios/
+│       ├── components/
+│       ├── pages/
+│       └── index.ts
+├── hooks/                       # Hooks globales
+├── pages/                       # Si usas Next.js, aquí van las rutas o vistas principales
+│   ├── index.tsx               # Home
+│   └── [...].tsx               # Rutas por nombre
+├── routes/                      # Rutas de navegación centralizadas (si no usas file-based routing)
+
+
+
 ## Features
 
 - 🚀 Server-side rendering

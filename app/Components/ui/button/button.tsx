@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Settings, RefreshCw,Star ,ChevronRight,ChevronLeft} from 'lucide-react';
 
-import type { MainContent, Products } from "~/";
+// import type { MainContent, Products } from "~/";
 
 export const MainComponent = (props: MainContent)=>{
   const { title, messageError, isComponer,data=[] } = props;

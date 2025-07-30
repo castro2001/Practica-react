@@ -1,4 +1,4 @@
-import { Welcome } from "~/Components/Welcome/Welcome"; 
+import { Welcome } from "~/Components/shared/Welcome/Welcome"; 
 import type { Route } from "./+types/home"; 
 import Logo from "~/assets/image/logo.png";
 

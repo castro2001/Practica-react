@@ -2,7 +2,7 @@ import { useState,useEffect } from "react";
 
 import { Menu, Moon, Sun} from "lucide-react"
 import BackgroundDefault from "~/assets/image/background_default.png"
-import { ModalNotificaciones } from "~/Components/ModalNotificaciones/ModalNotificaciones";
+import { ModalNotificaciones } from "~/Components/shared/ModalNotificaciones/ModalNotificaciones";
 import Usuario from "~/assets/image/usuario.png";
 
 export const Header = (props: IActionSideBar)=>{

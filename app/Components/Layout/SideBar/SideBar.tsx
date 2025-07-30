@@ -1,8 +1,6 @@
-import { Link, NavLink } from "react-router"
-import BackgroundDefault from "~/assets/image/background_default.png"
 import AdminLogo from "~/assets/image/AdminLogo.png"
 import { HomeIcon, MoonStar, Package, User } from "lucide-react"
-import { NavItemLinks } from "~/Components/NavItemLinks/NavItemLinks"
+import { NavItemLinks } from "~/Components/Layout/NavItemLinks/NavItemLinks"
 
 export const SideBar = (props: IActionSideBar) => {
     const { sidebarOpen, setSidebarOpen } = props;

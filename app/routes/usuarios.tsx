@@ -1,8 +1,8 @@
 import type { Route } from "../+types/root";
-import { DataGrid } from "~/Components/DataGrid/DataGrid"; 
+import { DataGrid } from "~/Components/shared/DataGrid/DataGrid"; 
 import { useFetch } from "~/hook/useFetchHook";
-import { PageUsuarioDesktop } from "~/pages/Usuario/desktop/page.usuario.desktop";
-import { PageUsuarioMovil } from "~/pages/Usuario/movil/page.usuario.movil";
+import { PageUsuarioDesktop } from "~/features/Usuario/desktop/page.usuario.desktop";
+import { PageUsuarioMovil } from "~/features/Usuario/movil/page.usuario.movil";
 
 export function meta({}: Route.MetaArgs) {
   return [

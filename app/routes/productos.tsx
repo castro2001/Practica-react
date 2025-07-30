@@ -1,10 +1,8 @@
-import { DataBodyDesktop } from "~/Components/DataGrid/DataBody/view/DataBody.desktop";
 import type { Route } from "../+types/root";
-import { DataGrid } from "~/Components/DataGrid/DataGrid"; 
+import { DataGrid } from "~/Components/shared/DataGrid/DataGrid"; 
 import { useFetch } from "~/hook/useFetchHook";
-import { DataBodyMovil } from "~/Components/DataGrid/DataBody/view/DataBody.movil";
-import { PageProductosDesktop } from "~/pages/productos/desktop/page.productos.desktop";
-import { PageProductosMovil } from "~/pages/productos/movil/page.productos.movil";
+import { PageProductosDesktop } from "~/features/productos/desktop/page.productos.desktop";
+import { PageProductosMovil } from "~/features/productos/movil/page.productos.movil";
 
 export function meta({}: Route.MetaArgs) {
   return [
