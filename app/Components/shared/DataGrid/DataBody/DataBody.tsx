@@ -1,4 +1,4 @@
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, RefreshCw, Search } from 'lucide-react';
 import React from 'react';
 import { Preoload } from '~/Components/ui/Preload/Preoload';
 
@@ -42,29 +42,35 @@ import { Preoload } from '~/Components/ui/Preload/Preoload';
    );
  
    // Componente de Empty State
-   const EmptyComponent = () => {
-     const obtenerMensajeVacio = () => {
-       if (terminoBusqueda.trim()) {
-         return `No se encontraron resultados para "${terminoBusqueda}".`;
-       }
-       return 'No hay elementos disponibles.';
-     };
- 
-     return (
-       <div className="bg-white dark:bg-gray-800">
-         <div className="text-center py-12 px-4 text-gray-500 dark:text-gray-200">
-           <div className="mb-2 text-base sm:text-lg">
-             {obtenerMensajeVacio()}
-           </div>
-           {terminoBusqueda && (
-             <div className="text-sm text-gray-400 dark:text-gray-200">
-               Intenta con otros términos de búsqueda
-             </div>
-           )}
-         </div>
-       </div>
-     );
+ const EmptyComponent = ( {terminoBusqueda} ) => {
+   const obtenerMensajeVacio = () => {
+     if (terminoBusqueda?.trim()) {
+       return `No se encontraron resultados para "${terminoBusqueda}".`;
+     }
+     return 'No hay elementos disponibles.';
    };
+ 
+   return (
+     <div className="bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-2xl">
+       <div className="text-center py-16 px-6">
+         <div className="w-16 h-16 bg-gradient-to-br from-gray-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+           <Search className="w-8 h-8 text-white" />
+         </div>
+         <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-3">
+           {terminoBusqueda?.trim() ? 'Sin resultados' : 'Sin elementos'}
+         </h3>
+         <p className="text-gray-600 dark:text-gray-400 mb-2 text-lg">
+           {obtenerMensajeVacio()}
+         </p>
+         {terminoBusqueda && (
+           <p className="text-sm text-gray-500 dark:text-gray-500">
+             Intenta con otros términos de búsqueda
+           </p>
+         )}
+       </div>
+     </div>
+   );
+ };
  
    // Renderizado condicional basado en el estado
    if (isLoading) {
@@ -76,21 +82,21 @@ import { Preoload } from '~/Components/ui/Preload/Preoload';
    }
  
    if (!data || data.length === 0) {
-     return <EmptyComponent />;
-   }
+    return <EmptyComponent terminoBusqueda={terminoBusqueda} />;
+  }
  
    // Renderizado normal de datos
    return (
-     <div className="bg-white dark:bg-gray-800">
-       <div className="divide-y divide-gray-100">
-         {data.map((item, index) => (
-           <div key={index} className="border-b border-gray-200 dark:border-gray-700">
-             <div className="hidden md:block">{renderDesktop(item, actions!)}</div>
-             <div className="block md:hidden">{renderMovil(item, actions!)}</div>
-           </div>
-         ))}
-       </div>
-     </div> 
+    <div className="bg-gradient-to-br from-white to-blue-50/50 dark:from-gray-800 dark:to-blue-900/10">
+      <div className="divide-y divide-gray-100/50 dark:divide-gray-700/50">
+        {data.map((item, index) => (
+          <div key={index} className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-all duration-300">
+            <div className="hidden md:block p-6">{renderDesktop(item, actions!)}</div>
+            <div className="block md:hidden p-4">{renderMovil(item, actions!)}</div>
+          </div>
+        ))}
+      </div>
+    </div>
    );
   };
 

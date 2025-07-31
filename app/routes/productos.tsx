@@ -48,7 +48,7 @@ export default function Productos() {
                     <PageProductosDesktop  product={product}  actions={actions} />
                 ),
                 renderMovil: (product) => (
-                <PageProductosMovil {... product} />
+                <PageProductosMovil  product={product}  actions={actions}  />
                 )
         },
         dataPaginator:{

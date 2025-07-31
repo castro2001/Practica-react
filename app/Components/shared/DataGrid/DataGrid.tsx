@@ -111,10 +111,16 @@ export const DataGrid = <T,> (props: IDataGrid<T> ) => {
   }
 
   return (
-    <div className="container mx-auto  rounded-lg shadow-lg overflow-hidden">
-      <DataHeader {...dataheader} />
-      <DataBody {...databody} /> 
-      {totalElementos > pagina && (<DataPaginator {...datapaginator}/>)}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
+    <div className="container mx-auto p-6">
+      <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+        <DataHeader {...dataheader} />
+        <DataBody {...databody} />
+        {totalElementos > pagina && (
+          <DataPaginator {...datapaginator} />
+        )}
+      </div>
     </div>
+  </div>
   );
 };

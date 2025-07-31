@@ -2,12 +2,18 @@ import { MoreHorizontal, Star } from "lucide-react";
 import { useNavigate } from "react-router";
   import BackgroundDefault from "~/assets/image/background_default.png"
 
-export const PageProductosMovil = (props: IProduct)=>{
-    const {id,title,slug,price,description,category,images,creationAt,updateAt} = props;
+interface PageProductosDesktopProps {
+  product: IProduct;
+  actions: IActionsDataBody;
+}
+
+export const PageProductosMovil : React.FC<PageProductosDesktopProps> = ({ product, actions }) => {
+     const { id, title, slug, price, description, category, images, creationAt, updateAt } = product;
+  const { isStarred, isArchived, isDraft, isRead } = actions;
      const navigate = useNavigate();
     
       const handleClick=()=>{
-    navigate(`/Detalle/Productos/${id}`, { state: { props } }); // ✅ Navegación con estado
+    navigate(`/Detalle/Productos/${id}`, { state: { product } }); // ✅ Navegación con estado
       }
     return (
         <>

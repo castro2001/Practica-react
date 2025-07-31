@@ -42,7 +42,7 @@ export default function Usuarios() {
             ),
             
             renderMovil: (usuarios) => (
-                <PageUsuarioMovil {... usuarios} />
+                <PageUsuarioMovil usuario={usuarios}  actions={actions} />
             )
         },
         dataPaginator:{

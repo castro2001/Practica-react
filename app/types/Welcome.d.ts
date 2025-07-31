@@ -1,9 +1,9 @@
 interface IWelcome{
     title:string,
     descripcion:IDescription;
-    image?:string;
+    image?:string | string[];
     isIcon?:boolean;
-      secondImage?: string | null; // ✅ Nuevo campo
+     
 }
 
 interface IDescription{
