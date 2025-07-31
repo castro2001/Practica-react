@@ -4,6 +4,9 @@ import Logo from "~/assets/image/background_default.png";
 import { useParams, useLocation } from "react-router";
 import { useFetch } from "~/hook/useFetchHook";
 import { User, Package, Star, Tag, Calendar, DollarSign, Mail, Shield, ChevronLeft } from "lucide-react";
+import { Card } from "~/Components/ui/Card/Card";
+import { Section } from "~/Components/Layout/Section/Section";
+import { CardPreload } from "~/Components/ui/CardPreload/CardPreload";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,6 +18,42 @@ export function meta({}: Route.MetaArgs) {
 export default function Detalle() {
   const { tipo, id } = useParams();
   const location = useLocation();
+  const themesProductos:ICardThemes[]= [
+    {
+      classNameIcon:"from-green-500 to-emerald-600",
+      classNameText:"text-3xl font-bold text-green-600 dark:text-green-400"
+    },
+    {
+      classNameIcon:"from-purple-500 to-pink-600 ",
+      classNameText:"text-xl font-semibold text-purple-600 dark:text-purple-400"
+    },
+    {
+      classNameIcon:"from-orange-500 to-red-600",
+      classNameText:"text-sm font-medium text-gray-600 dark:text-gray-300"
+    },
+    {
+      classNameIcon:"from-indigo-500 to-purple-600",
+      classNameText:"text-gray-700 dark:text-gray-300 leading-relaxed text-lg prose prose-lg dark:prose-invert max-w-none"
+    },
+  ]
+  const themesUsuarios:ICardThemes[]= [
+    {
+      classNameIcon:" from-blue-500 to-cyan-600 ",
+      classNameText:" text-blue-600 dark:text-blue-400 font-bold"
+    },
+    {
+      classNameIcon:" from-green-500 to-teal-600",
+      classNameText:"text-green-600 dark:text-green-400 text-sm font-medium  break-all"
+    },
+    {
+      classNameIcon:"from-purple-500 to-indigo-600  ",
+      classNameText:"bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 inline-flex items-center px-3 py-1 rounded-full"
+    },
+  ]
+
+  const [themeUsuario1,themeUsuario2,themeUsuario3]= themesUsuarios
+  const [themeProducto1, themeProducto2, themeProducto3,themeProducto4] = themesProductos;
+
 
   // Datos opcionales desde navegación
   const dataState = location.state?.data;
@@ -196,140 +235,92 @@ export default function Detalle() {
 
             {/* Cards de información detallada */}
             {tipo === "Productos" && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                {/* Card de Precio */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                      <DollarSign className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Precio</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Valor del producto</p>
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                    ${finalData.price || 0}
-                  </div>
-                </div>
+              <Section 
+              classNameContainer=""
+              content={
+                  <>
 
-                {/* Card de Categoría */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
-                      <Tag className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Categoría</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Clasificación</p>
-                    </div>
-                  </div>
-                  <div className="text-xl font-semibold text-purple-600 dark:text-purple-400">
-                    {finalData.category?.name || 'Sin categoría'}
-                  </div>
-                </div>
+                    <Card  titulo="Precio" 
+                    subtitulo="Valor del producto" 
+                    icon={<DollarSign className="w-6 h-6 text-white" />} 
+                    content={ finalData.price || 0} 
+                    themes={themeProducto1}
+                    />
 
-                {/* Card de Fechas */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
-                      <Calendar className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Creado</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Fecha de registro</p>
-                    </div>
-                  </div>
-                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    {finalData.creationAt ? new Date(finalData.creationAt).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    }) : 'No disponible'}
-                  </div>
-                </div>
-              </div>
+                    <Card  titulo="Categoría" 
+                    subtitulo="Clasificación" 
+                    icon={<Tag className="w-6 h-6 text-white" />} 
+                    content={finalData.category?.name || 'Sin categoría'} 
+                        themes={themeProducto2}
+                    />
+
+                    <Card  titulo="Creado" 
+                    subtitulo="Fecha de registro" 
+                    icon={<Calendar className="w-6 h-6 text-white" />} 
+                    content={finalData.creationAt ? new Date(finalData.creationAt).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) : 'No disponible'}
+                        themes={themeProducto3}
+                    />
+                  </>  
+              } />
+
+              
             )}
 
             {tipo === "Usuario" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {/* Card de Información Personal */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
-                      <User className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Nombre</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Información personal</p>
-                    </div>
-                  </div>
-                  <div className="text-xl font-semibold text-blue-600 dark:text-blue-400">
-                    {finalData.name || 'No disponible'}
-                  </div>
-                </div>
+               <Section 
+              classNameContainer=""
+              content={
+                  <>
+                  <Card  titulo="Nombre" 
+                  subtitulo="Información personal" 
+                  icon={<User className="w-6 h-6 text-white" />} 
+                  content={finalData.name || 'No disponible'} 
+                  themes={themeUsuario1}
+                  />
 
-                {/* Card de Email */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center">
-                      <Mail className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Email</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Correo electrónico</p>
-                    </div>
-                  </div>
-                  <div className="text-sm font-medium text-green-600 dark:text-green-400 break-all">
-                    {finalData.email || 'No disponible'}
-                  </div>
-                </div>
-
-                {/* Card de Rol */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-white">Rol</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Permisos de usuario</p>
-                    </div>
-                  </div>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-                    {finalData.role || 'Sin rol'}
-                  </div>
-                </div>
-              </div>
+                  <Card  titulo="Email" 
+                  subtitulo="Correo Electrónico" 
+                  icon={<User className="w-6 h-6 text-white" />} 
+                  content={finalData.email || 'No disponible'} 
+                     themes={themeUsuario2}
+                  />
+            
+                  <Card  titulo="Rol" 
+                  subtitulo="Permiso de usuario" 
+                  icon={<User className="w-6 h-6 text-white" />} 
+                  content={finalData.role || 'No disponible'} 
+                     themes={themeUsuario3}
+                  />
+                   </>  
+              } />
             )}
 
             {/* Descripción completa en card separada */}
             {finalData.description && tipo === "Productos" && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all duration-300">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    <Star className="w-4 h-4 text-white" />
-                  </div>
-                  Descripción Completa
-                </h2>
-                <div className="prose prose-lg dark:prose-invert max-w-none">
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-                    {finalData.description}
-                  </p>
-                </div>
-              </div>
+              <Card  titulo="Descripción Completas" 
+              subtitulo="" 
+              icon={<Star className="w-4 h-4 text-white" />} 
+              content={finalData.description}
+              themes={themeProducto4}
+              />
+
+           
             )}
           </>
         )}
 
         {!finalData && !isLoading && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8 text-gray-400" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">No hay datos</h2>
-            <p className="text-gray-600 dark:text-gray-300">No se encontraron datos para mostrar.</p>
-          </div>
+          <CardPreload 
+            titulo="No hay datos"
+            subtitulo="No se encontraron datos para mostrar."
+            icon={<Package className="w-8 h-8 text-gray-400" />}
+          
+          />
+        
         )}
       </div>
     </div>
