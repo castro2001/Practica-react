@@ -36,7 +36,7 @@ export const Welcome = (props: IWelcome) => {
       setCurrentImageIndex(index);
     };
   return (
-<section className="bg-white dark:bg-gray-900 rounded-3xl m-5 shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+<section className="bg-white dark:bg-gray-900 rounded-3xl  shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
   <div className="container flex flex-col-reverse lg:flex-row items-center px-8 py-12 mx-auto">
     {/* CONTENIDO */}
     <div className="w-full lg:w-1/2 lg:pr-12">
