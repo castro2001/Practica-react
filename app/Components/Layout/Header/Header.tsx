@@ -3,7 +3,7 @@ import { useState,useEffect } from "react";
 import { Menu, Moon, Sun} from "lucide-react"
 import BackgroundDefault from "~/assets/image/background_default.png"
 import { ModalNotificaciones } from "~/Components/shared/ModalNotificaciones/ModalNotificaciones";
-import {mensajesModal,notificationsPanel,panelUser} from "~/mockup/modalNotificaciones";
+import {mensajesModal,notificationsPanel,panelUser} from "~/data/notificaciones/content_notificaciones";
 
 export const Header = (props: IActionSideBar)=>{
     const { sidebarOpen, setSidebarOpen } = props;
@@ -48,6 +48,7 @@ export const Header = (props: IActionSideBar)=>{
         redirect:""
     }        
   }
+  
 
     useEffect(() => {
         if (theme === 'dark') {

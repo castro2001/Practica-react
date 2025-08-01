@@ -7,6 +7,9 @@ import { User, Package, Star, Tag, Calendar, DollarSign, Mail, Shield, ChevronLe
 import { Card } from "~/Components/ui/Card/Card";
 import { Section } from "~/Components/Layout/Section/Section";
 import { CardPreload } from "~/Components/ui/CardPreload/CardPreload";
+import { themesProductos } from "~/data/themes/producto";
+import { themesUsuarios } from "~/data/themes/usuario";
+import { CardHeader } from "~/Components/ui/CardHeader/CardHeader";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -18,42 +21,9 @@ export function meta({}: Route.MetaArgs) {
 export default function Detalle() {
   const { tipo, id } = useParams();
   const location = useLocation();
-  const themesProductos:ICardThemes[]= [
-    {
-      classNameIcon:"from-green-500 to-emerald-600",
-      classNameText:"text-3xl font-bold text-green-600 dark:text-green-400"
-    },
-    {
-      classNameIcon:"from-purple-500 to-pink-600 ",
-      classNameText:"text-xl font-semibold text-purple-600 dark:text-purple-400"
-    },
-    {
-      classNameIcon:"from-orange-500 to-red-600",
-      classNameText:"text-sm font-medium text-gray-600 dark:text-gray-300"
-    },
-    {
-      classNameIcon:"from-indigo-500 to-purple-600",
-      classNameText:"text-gray-700 dark:text-gray-300 leading-relaxed text-lg prose prose-lg dark:prose-invert max-w-none"
-    },
-  ]
-  const themesUsuarios:ICardThemes[]= [
-    {
-      classNameIcon:" from-blue-500 to-cyan-600 ",
-      classNameText:" text-blue-600 dark:text-blue-400 font-bold"
-    },
-    {
-      classNameIcon:" from-green-500 to-teal-600",
-      classNameText:"text-green-600 dark:text-green-400 text-sm font-medium  break-all"
-    },
-    {
-      classNameIcon:"from-purple-500 to-indigo-600  ",
-      classNameText:"bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 inline-flex items-center px-3 py-1 rounded-full"
-    },
-  ]
-
+ 
   const [themeUsuario1,themeUsuario2,themeUsuario3]= themesUsuarios
   const [themeProducto1, themeProducto2, themeProducto3,themeProducto4] = themesProductos;
-
 
   // Datos opcionales desde navegación
   const dataState = location.state?.data;
@@ -197,32 +167,14 @@ export default function Detalle() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header con botón de regreso */}
-        <div className="mb-8 flex items-center md:justify-center md:items-center gap-8 flex-wrap-reverse">
-           <button 
-            onClick={() => window.history.back()}
-            className="flex items-center gap-2 px-4 py-2 ml-8 cursor-pointer bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700 dark:text-gray-200 hover:scale-105"
-          >
-            <ChevronLeft size={20} />
-            <span className="font-medium">Volver</span>
-          </button>
-          <div className="flex items-center gap-3">
-            {tipo === "Usuario" ? (
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-            ) : (
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-teal-600 rounded-xl flex items-center justify-center">
-                <Package className="w-5 h-5 text-white" />
-              </div>
-            )}
-            <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-              {tipo === "Usuario" ? "Perfil de Usuario" : "Detalles del Producto"}
-            </h1>
-          </div>
+        <CardHeader
+          titulo="Detalles"
+          icon={<ChevronLeft className="w-6 h-6 text-gray-500" />}
+          icono2={tipo === "Usuario" ?<User className="w-5 h-5 text-white" /> : <Package className="w-6 h-6 text-white" />}
+          iconotitulo={tipo === "Usuario" ? "Perfil de Usuario" : "Detalles del Producto"}
 
-         
-         
-        </div>
+
+        />
 
         {finalData && tipo && (
           <>

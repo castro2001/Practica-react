@@ -32,11 +32,11 @@ export const ModalNotificaciones = (props: IActionsModal) => {
   return (
     <div
       ref={dropdownRef}
-      className={`${classNameContainer} absolute  z-50 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-slate-700`}
+      className={`${classNameContainer} absolute bg-gradient-to-br z-50 bg-white dark:bg-slate-800 rounded-lg shadow-2xl border dark:border-slate-700`}
     >
       {/* Header del dropdown */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-700">
-        <h2 className="text-lg font-medium text-white">{title}</h2>
+      <div className="flex items-center justify-between p-4 border-b dark:border-slate-700">
+        <h2 className="text-lg font-medium dark:text-white text-gray-700">{title}</h2>
         <button 
           className="text-blue-400 text-sm hover:text-blue-300 transition-colors"
           onClick={onClose}
@@ -52,8 +52,8 @@ export const ModalNotificaciones = (props: IActionsModal) => {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-700">
-        <button className="text-blue-400 text-sm hover:text-blue-300 transition-colors w-full text-center">
+      <div className="p-4 border-t dark:border-slate-700">
+        <button className="text-blue-400 text-sm dark:hover:text-blue-300 transition-colors w-full text-center">
           Ver todas las notificaciones
         </button>
       </div>

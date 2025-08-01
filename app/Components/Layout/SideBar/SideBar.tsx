@@ -1,7 +1,7 @@
 import AdminLogo from "~/assets/image/AdminLogo.png"
 import { HomeIcon, MoonStar, Package, User } from "lucide-react"
 import { NavItemLinks } from "~/Components/Layout/NavItemLinks/NavItemLinks"
-import {link} from "~/mockup/menu";
+import {link} from "~/data/menu";
 export const SideBar = (props: IActionSideBar) => {
     const { sidebarOpen, setSidebarOpen } = props;
 

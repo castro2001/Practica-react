@@ -15,21 +15,21 @@ export const notificationsPanel = (
                 className="w-10 h-10 rounded-full"
                 />
             <div className="flex-1">
-                <p className="text-sm text-white">
-                <span className="font-medium">Emma Watson</span> replied to your comment: "Hello world 😊"
+                <p className="text-sm dark:text-white text-gray-500">
+                <span className="font-medium  dark:text-white text-gray-500">Emma Watson</span> replied to your comment: "Hello world 😊"
                 </p>
                 <p className="text-xs text-slate-400 mt-1">Just now</p>
             </div>
     </div>
 
     {/* Albert Brooks notification */}
-        <div className="flex items-start space-x-3 mb-4 p-2 hover:bg-slate-700 rounded-lg transition-colors">
+        <div className="flex items-start space-x-3 mb-4 p-2 dark:hover:bg-slate-700 rounded-lg transition-colors  hover:bg-gray-300">
             <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-sm font-medium text-white">
                 AB
             </div>
             <div className="flex-1">
-                <p className="text-sm text-white">
-                <span className="font-medium">Albert Brooks</span> reacted to Mia Khalifa's status
+                <p className="text-sm dark:text-white text-gray-500">
+                <span className="font-medium  dark:text-white text-gray-600">Albert Brooks</span> reacted to Mia Khalifa's status
                 </p>
                 <div className="flex items-center mt-1">
                     <span className="text-red-500 text-lg mr-2">❤️</span>
@@ -49,7 +49,7 @@ export const notificationsPanel = (
     <span className="text-lg">🌤️</span>
     </div>
     <div className="flex-1">
-    <p className="text-sm text-white">
+    <p className="text-sm text-gray-500 dark:text-white">
     The forecast today shows a low of 20°C in California. See today's weather.
     </p>
     <div className="flex items-center mt-1">
@@ -71,6 +71,7 @@ export const panelUser = (
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a>
 </>
 );
+
 export const mensajesModal = (
 <>        
     <div className="flex items-start space-x-3 mb-4 p-2 hover:bg-slate-700 rounded-lg transition-colors">
