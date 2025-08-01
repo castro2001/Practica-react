@@ -197,10 +197,10 @@ export default function Detalle() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-8">
         {/* Header con botón de regreso */}
-        <div className="mb-8 flex items-center gap-4">
-          <button 
+        <div className="mb-8 flex items-center md:justify-center md:items-center gap-8 flex-wrap-reverse">
+           <button 
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700 dark:text-gray-200 hover:scale-105"
+            className="flex items-center gap-2 px-4 py-2 ml-8 cursor-pointer bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700 dark:text-gray-200 hover:scale-105"
           >
             <ChevronLeft size={20} />
             <span className="font-medium">Volver</span>
@@ -219,6 +219,9 @@ export default function Detalle() {
               {tipo === "Usuario" ? "Perfil de Usuario" : "Detalles del Producto"}
             </h1>
           </div>
+
+         
+         
         </div>
 
         {finalData && tipo && (

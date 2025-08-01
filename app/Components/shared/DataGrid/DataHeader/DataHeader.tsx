@@ -16,11 +16,12 @@ export const DataHeader = (props: IDataHeader)=> {
   };
   return (
     <>
-     <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+     <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-800/80 
+     backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="px-6 py-6">
           {/* Header principal */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4 flex-wrap-reverse">
+          <div className="flex items-center justify-start mb-6 flex-wrap md:justify-between">
+            <div className="flex items-center space-x-4 ">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />

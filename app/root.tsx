@@ -38,15 +38,21 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
         <Meta />
         <Links />
       </head>
-      <body className="flex min-h-screen ">
+      <body className=" min-h-screen  bg-gray-50 dark:bg-gray-900">
 
         <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
-        <div className="flex flex-col flex-grow overflow-hidden">
-          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
-          {/* <Breadcrumb /> */}
-        <main className="p-4 h-full">
-          {children}
-        </main>
+
+           <div className={`flex flex-col min-h-screen transition-all
+            duration-300 ease-in-out bg-gradient-to-br from-slate-50
+             via-blue-50 to-indigo-100 dark:from-slate-900
+              dark:via-blue-900 dark:to-indigo-900 ${
+            sidebarOpen ? "ml-64" : "ml-16"
+        }`}>
+            <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+            
+            <main className="flex-1  pt-20 overflow-y-auto">
+                {children}
+            </main>
         </div>
         <ScrollRestoration />
         <Scripts />
