@@ -16,7 +16,7 @@ export const PageUsuarioDesktop :React.FC<PageProductosDesktopProps> = ({ usuari
        const navigate = useNavigate();
     
       const handleClick=()=>{
-        navigate(`/Detalle/Usuario/${id}`, { state: { usuario } }); // ✅ Navegación con estado
+        navigate(`/dashboard/Detalle/Usuario/${id}`, { state: { usuario } }); // ✅ Navegación con estado
       }
     return (
         <>

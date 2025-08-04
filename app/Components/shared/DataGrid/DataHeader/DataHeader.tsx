@@ -1,7 +1,23 @@
-import { RotateCcw, Settings,Search, Loader2, Plus, Sparkles } from 'lucide-react';
+import { RotateCcw, Settings,Search, Loader2, Plus, Sparkles, Trash, Grid, List } from 'lucide-react';
+import { useState } from 'react';
+import { Modal } from '~/Components/ui/Modal/Modal';
 
 export const DataHeader = (props: IDataHeader)=> {
-  const { title="Titulo por Defecto", btn_text, isSearch, isUpdate, terminoBusqueda = '', isLoading= false, setTerminoBusqueda } = props;
+  const { title="Titulo por Defecto", 
+    btn_text="text",
+     isSearch=true, 
+     isUpdate=true,
+     isBtn=true, 
+     isIcon=false,
+     icon,
+    //  modal,
+     terminoBusqueda = '', 
+     viewMode='',
+     setViewMode,
+     isLoading= false, 
+     setTerminoBusqueda 
+    } = props;
+// const {isOpen,setIsOpen,size ="md",contentModal}=modal;
 
   const manejarBusqueda = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (setTerminoBusqueda) {
@@ -24,7 +40,8 @@ export const DataHeader = (props: IDataHeader)=> {
             <div className="flex items-center space-x-4 ">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-white" />
+                  {isIcon ? icon:<Sparkles className="w-5 h-5 text-white" /> }
+                  
                 </div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                   {title}
@@ -49,39 +66,61 @@ export const DataHeader = (props: IDataHeader)=> {
                     : 'text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:scale-105'
                 }`}
               >
-                <RotateCcw className="w-5 h-5" />
+                <Trash className="w-5 h-5" />
                 <div className="absolute top-10 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  Limpiar
+                  Limpiar busqueda
                 </div>
               </button>
               
               {/* Botón configuración */}
               <button
                 disabled={isLoading}
+                onClick={()=> window.location.reload()}
                 className={`group relative p-3 rounded-xl transition-all duration-300 ${
                   isLoading
                     ? 'text-gray-300 cursor-not-allowed bg-gray-100 dark:bg-gray-700'
                     : 'text-gray-500 hover:text-purple-600 dark:text-gray-400 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:scale-105'
                 }`}
               >
-                <Settings className="w-5 h-5" />
-                <div className="absolute z-20 top-10 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  Configurar
+                <RotateCcw className="w-5 h-5" />
+                <div className="absolute z-20 top-10 left-1/2 transform cursor-pointer -translate-x-1/2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  Actualizar
                 </div>
               </button>
-              
+                  {/* Ordenar */}
+          
+
+              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <button
+                   onClick={() => setViewMode && setViewMode('grid') ||setViewMode && setViewMode('table')   }
+                  className={`p-2 rounded ${viewMode === 'grid' ||viewMode === 'table' ? 'bg-white shadow-sm text-blue-800' : ''}`}
+                >
+                  <Grid className="w-4 h-4 " />
+                </button>
+                <button
+                  onClick={() => setViewMode &&  setViewMode('list')}
+                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow-sm text-gray-700' : ''}`}
+                >
+                  <List className="w-4 h-4 " />
+                </button>
+              </div>
               {/* Botón principal con gradiente */}
-              <button
-                disabled={isLoading}
-                className={`group relative px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg ${
-                  isLoading
-                    ? 'bg-gray-400 cursor-not-allowed text-white'
-                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:shadow-xl hover:scale-105 transform'
-                }`}
-              >
-                <Plus className="w-5 h-5" />
-                <span>{btn_text}</span>
-              </button>
+              {
+                isBtn && (
+                    <button
+                      disabled={isLoading}
+                      className={`group relative px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg ${
+                        isLoading
+                          ? 'bg-gray-400 cursor-not-allowed text-white'
+                          : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white hover:shadow-xl hover:scale-105 transform'
+                      }`}
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span>{btn_text}</span>
+                    </button>
+                )
+              }
+             
             </div>
           </div>
     
@@ -106,7 +145,9 @@ export const DataHeader = (props: IDataHeader)=> {
             />
           </div>
         </div>
-      </div> 
+      </div>
+      
+
     </>
   );
 }

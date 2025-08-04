@@ -15,9 +15,20 @@ interface IActionModalBody{
 interface IActionSideBar {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+
 }
 
 interface IActionsPanel {
  Open: boolean;
   setOpen: (open: boolean) => void;
+}
+
+interface ModalReutilizable{
+    isOpen:boolean, 
+   onClose: () => boolean;
+  title:string, 
+  children:React.ReactNode, 
+  size:string
+  showCloseButton? :boolean
+  closeOnOverlayClick?:boolean
 }

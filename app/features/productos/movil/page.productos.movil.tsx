@@ -13,7 +13,7 @@ export const PageProductosMovil : React.FC<PageProductosDesktopProps> = ({ produ
      const navigate = useNavigate();
     
       const handleClick=()=>{
-    navigate(`/Detalle/Productos/${id}`, { state: { product } }); // ✅ Navegación con estado
+    navigate(`/dashboard/Detalle/Productos/${id}`, { state: { product } }); // ✅ Navegación con estado
       }
     return (
         <>
