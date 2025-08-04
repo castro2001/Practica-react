@@ -3,53 +3,15 @@ import { useState,useEffect } from "react";
 import { Menu, Moon, Sun} from "lucide-react"
 import BackgroundDefault from "~/assets/image/background_default.png"
 import { ModalNotificaciones } from "~/Components/shared/ModalNotificaciones/ModalNotificaciones";
-import {mensajesModal,notificationsPanel} from "~/data/notificaciones/content_notificaciones";
-import { useAuth } from "~/context/Auth/authContext";
+import {mensajesModal,notificationsPanel,panelUser} from "~/data/notificaciones/content_notificaciones";
 
 export const Header = (props: IActionSideBar)=>{
     const { sidebarOpen, setSidebarOpen } = props;
-    const {logout,user}= useAuth();
 
     const [theme,setTheme] = useState('light');
     const [isOpen, setIsOpen] = useState(false);
     const [isOpenPanel, setIsOpenPanel] = useState(false);
     const [isOpenPanelUser,setIsOpenPanelUser] = useState(false);
-     const panelUser  = (
-<>
-{/* <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mi Perfil</a>
-<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Configuración</a>
-<div className="border-t border-gray-100 dark:border-gray-700"></div>
-<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a> */}
-
-
-<div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-3">
-            <img
-              className="w-8 h-8 rounded-full"
-              src={user?.avatar || BackgroundDefault }
-              alt={user?.name}
-            />
-            <div className="hidden md:block">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {user?.name}
-              </p>
-              <p className="text-xs text-gray-500 capitalize">
-                {user?.role}
-              </p>
-            </div>
-          </div>
-          
-          <button
-            onClick={logout}
-            className="px-3 py-2 text-sm font-medium text-white bg-red-600 
-              rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-
-</>
-);
 
   const modalNotificaciontes: IActionsModal={
     isOpen:isOpenPanel,
@@ -169,7 +131,7 @@ export const Header = (props: IActionSideBar)=>{
                     onClick={() => setIsOpenPanelUser(!isOpenPanelUser)} 
                     className="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out"
                 >
-                    <img className="h-10 w-10 rounded-full object-cover" src={user?.avatar} alt="User Avatar"/>
+                    <img className="h-10 w-10 rounded-full object-cover" src={BackgroundDefault} alt="User Avatar"/>
                 </button>
                 <ModalNotificaciones {...modalUsuarios} />
             </div>

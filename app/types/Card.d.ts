@@ -27,14 +27,3 @@ interface ICardMain{
     icon: React.ReactNode;
     subtitulo?:string;
 }
-
-interface CardProduct {
-    rating?:number;
-    viewMode?:string;
-    review?: number;
-    inStock?:boolean;
-    featured?:boolean;
-    icono?:React.ReactNode
-    products: IProduct;
-    redirect?:string;
-}

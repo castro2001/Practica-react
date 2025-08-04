@@ -1,62 +1,9 @@
 import AdminLogo from "~/assets/image/AdminLogo.png"
-import { HomeIcon, MoonStar, Package, ShoppingBag, User } from "lucide-react"
+import { HomeIcon, MoonStar, Package, User } from "lucide-react"
 import { NavItemLinks } from "~/Components/Layout/NavItemLinks/NavItemLinks"
-// import {link} from "~/data/menu";
-import { useLocation } from "react-router";
-import { useAuth } from '~/context/Auth/authContext'; 
-
+import {link} from "~/data/menu";
 export const SideBar = (props: IActionSideBar) => {
-    const location = useLocation();
-  const { user } = useAuth();
-
-  const icono = user?.role === "admin" && <User className="sidebar-icon" />
-
-
     const { sidebarOpen, setSidebarOpen } = props;
-     const redirectToRoles = (redirectAdmin:string,redirectCustomer:string)=>{
-        return user?.role ==="admin"&& redirectAdmin || user?.role ==="customer"&& redirectCustomer
-    }
-    const link: INavItem[] = [
-    {
-        redirect: "/",
-        icon: <HomeIcon className="sidebar-icon" />,
-        text: "Home",
-        className: "sidebar-item flex items-center py-3 px-4 rounded-lg mx-2 mb-2 transition-colors duration-200 ease-in-out",
-        clasNameText: "sidebar-text whitespace-nowrap transition-all duration-300 ease-in-out",
-        roles: ["customer","admin"]
-        },
-        {
-        redirect: `${redirectToRoles("/dashboard/Productos","/Productos")}`,
-        icon: <ShoppingBag className="sidebar-icon" />,
-        text: "Tienda Productos",
-        className: "sidebar-item flex items-center py-3 px-4 rounded-lg mx-2 mb-2 transition-colors duration-200 ease-in-out",
-        clasNameText: "sidebar-text whitespace-nowrap transition-all duration-300 ease-in-out",
-        roles: ["admin","customer"]
-        },
-        {
-        redirect:  `${redirectToRoles("dashboard/Usuarios","")}`,
-        icon: icono,
-        text:  `${user?.role === "admin" && "Usuario"}`,
-        className: "sidebar-item flex items-center py-3 px-4 rounded-lg mx-2 mb-2 transition-colors duration-200 ease-in-out",
-        clasNameText: "sidebar-text whitespace-nowrap transition-all duration-300 ease-in-out",
-        roles: ["admin"]
-        },
-//         {
-//    redirect:  `MisProductos`,
-//         icon: < Package className="sidebar-icon"/>,
-//         text:  `Mis Productos`,
-//         className: "sidebar-item flex items-center py-3 px-4 rounded-lg mx-2 mb-2 transition-colors duration-200 ease-in-out",
-//         clasNameText: "sidebar-text whitespace-nowrap transition-all duration-300 ease-in-out",
-//         roles: ["customer"]
-//         }
-
-    ];
-    
-
-   const filteredMenuItems = link.filter((item) =>
-        item.roles.includes(user?.role ?? "")
-    );
-
 
     return (
         <>
@@ -85,7 +32,7 @@ export const SideBar = (props: IActionSideBar) => {
             </header>
             
             <nav className="flex-1 py-4  scrollbar-custom">
-                <NavItemLinks navItems={filteredMenuItems} sidebarOpen={sidebarOpen} />
+                <NavItemLinks navItems={link} sidebarOpen={sidebarOpen} />
             </nav>
         </aside>
         </>

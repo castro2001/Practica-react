@@ -5,7 +5,7 @@ import { DataPaginator } from './DataPaginator/DataPaginator';
 
 export const DataGrid = <T,> (props: IDataGrid<T> ) => {
   const { dataHeader, dataBody, dataPaginator ,filterConfig } = props;
-  const {title,btn_text,isSearch,isUpdate,viewMode="table",setViewMode} = dataHeader;
+  const {title,btn_text,isSearch,isUpdate} = dataHeader;
   const { data = [] ,renderDesktop,renderMovil,isLoading,errors} = dataBody;
   const { pagina = 5 } = dataPaginator;
 
@@ -88,9 +88,6 @@ export const DataGrid = <T,> (props: IDataGrid<T> ) => {
     btn_text: btn_text, 
     isSearch: isSearch ,
     isUpdate : isUpdate,
-    viewMode:viewMode,
-    setViewMode:setViewMode,
-    isOptions:true,
     terminoBusqueda:terminoBusqueda,
     setTerminoBusqueda:setTerminoBusqueda
   }
@@ -118,28 +115,7 @@ export const DataGrid = <T,> (props: IDataGrid<T> ) => {
     <div className="container mx-auto p-6">
       <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
         <DataHeader {...dataheader} />
-        
-       {viewMode === "table" ? (
-  <div className="bg-white dark:bg-gray-800">
-    {/* Header */}
-    <div className="flex items-center bg-gray-50 dark:bg-gray-700 border-b-2 border-gray-200 dark:border-gray-600 px-6 py-4 font-semibold text-xs text-gray-600 dark:text-gray-300 uppercase tracking-wider">
-      <div className="w-16 flex-shrink-0">ID</div>
-      <div className="w-20 flex-shrink-0">Imagen</div>
-      <div className="flex-1 min-w-0 px-4">Producto</div>
-      <div className="w-24 flex-shrink-0">Precio</div>
-      <div className="w-32 flex-shrink-0 text-center">Acciones</div>
-    </div>
-    
-    {/* Contenido */}
-    <div className="divide-y divide-gray-200 dark:divide-gray-700">
-      <DataBody {...databody} />
-    </div>
-  </div>
-) : (
-  <DataBody {...databody} />
-)}
-
-        
+        <DataBody {...databody} />
         {totalElementos > pagina && (
           <DataPaginator {...datapaginator} />
         )}

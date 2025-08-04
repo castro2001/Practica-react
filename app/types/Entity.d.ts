@@ -8,31 +8,13 @@ interface IDataGrid<T>{
 interface IDataHeader{
     title?: string;
     btn_text?:string;
-    isBtn?:boolean;
     isSearch?:boolean;
     isUpdate?:boolean;
-    isLoading?: boolean;
-    isIcon?:boolean;
-    isOptions:boolean;
-    viewMode?:string;
-    // modal:IModalDataHeader;
-    setViewMode?:(mode: string) => void;
-    icon?:React.ReactNode;
-    terminoBusqueda?: string;
-    setTerminoBusqueda?: (termino: string) => void;
-}
+        isLoading?: boolean;
 
-interface IModalDataHeader{
-    isOpen: boolean;
-  setIsOpen: (open:boolean) => void;
-  size:string;
-  contentModal: React.ReactNode;
-}
+      terminoBusqueda?: string;
+      setTerminoBusqueda?: (termino: string) => void;
 
-
-interface Options{
-  name:string;
-  
 }
 
 interface IDataBody <T>{
@@ -41,8 +23,7 @@ interface IDataBody <T>{
     totalElementos?: number;
     actions?: IActionsDataBody;
     isLoading?: boolean;
-    errors?:Error |null;
-  
+    errors: Error | null;
     renderDesktop: (item: T,actions: IActionsDataBody ) => React.ReactNode;
     renderMovil: (item: T,actions: IActionsDataBody) => React.ReactNode;
 }
@@ -62,7 +43,7 @@ interface IDataPaginatorConfig {
 
 // Types para filtros dinámicos
 interface IFilterConfig<T> {
-  searchFields?: (keyof T)[];  // Campos donde buscar
+  searchFields: (keyof T)[];  // Campos donde buscar
   customFilter?: (item: T, searchTerm: string) => boolean; // Función de filtro personalizada
 }
 
@@ -71,6 +52,4 @@ interface IActionsDataBody{
   isDraft?: boolean;
   isRead?: boolean;
   isArchived?: boolean;
-        viewMode?:string;
-          setViewMode?:(mode: string) => void;
 }

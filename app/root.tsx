@@ -12,8 +12,6 @@ import "./app.css";
 import { Header } from "./Components/Layout/Header/Header";
 import { SideBar } from "./Components/Layout/SideBar/SideBar";
 import { useState } from "react";
-import { AuthProvider } from "./context/Auth/authContext";
-import { ApiProvider } from "./context/Data/ApiContext";
 
 
 export const links: Route.LinksFunction = () => [
@@ -41,12 +39,22 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
         <Links />
       </head>
       <body className=" min-h-screen  bg-gray-50 dark:bg-gray-900">
-          <AuthProvider>
-            <ApiProvider>
-            {children}
-            </ApiProvider>
-          </AuthProvider>
-            <ScrollRestoration />
+
+        <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+
+           <div className={`flex flex-col min-h-screen transition-all
+            duration-300 ease-in-out bg-gradient-to-br from-slate-50
+             via-blue-50 to-indigo-100 dark:from-slate-900
+              dark:via-blue-900 dark:to-indigo-900 ${
+            sidebarOpen ? "ml-64" : "ml-16"
+        }`}>
+            <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen}/>
+            
+            <main className="flex-1  pt-20 overflow-y-auto">
+                {children}
+            </main>
+        </div>
+        <ScrollRestoration />
         <Scripts />
       </body>
     </html>

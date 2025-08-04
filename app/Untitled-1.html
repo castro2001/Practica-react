@@ -1,651 +1,823 @@
-// types/auth.ts
-export interface User {
-  id: number;
-  email: string;
-  name: string;
-  role: string;
-  avatar: string;
-}
+import React, { useState, useEffect } from 'react';
+import { Search, Settings, RefreshCw,Star ,ChevronRight,ChevronLeft} from 'lucide-react';
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+// import type { MainContent, Products } from "~/";
 
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-  avatar?: string;
-}
+export const MainComponent = (props: MainContent)=>{
+  const { title, messageError, isComponer,data=[] } = props;
+  //Paginacion
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [empleadosFiltradasPaginadas, SetEmpleadosFiltradasPaginadas] = useState<Products[]>([]);
+  const empleadosPorPagina = 5;
+  const [datosFiltrados, setDatosFiltrados] = useState<Products[]>(data);
 
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
-export interface IAuthContextType extends AuthState {
-  login: (credentials: LoginCredentials) => Promise<boolean>;
-  register: (data: RegisterData) => Promise<boolean>;
-  logout: () => void;
-  refreshAuth: () => Promise<void>;
-  hasRole: (role: string) => boolean;
-  hasAnyRole: (roles: string[]) => boolean;
-}
-
-// services/authService.ts
-const API_BASE = 'https://api.escuelajs.co/api/v1';
-
-class AuthService {
-  private getToken(): string | null {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith('auth_token='))
-      ?.split('=')[1] || null;
-  }
-
-  private setToken(token: string): void {
-    const expires = new Date();
-    expires.setTime(expires.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 días
-    document.cookie = `auth_token=${token}; expires=${expires.toUTCString()}; path=/; secure; samesite=strict`;
-  }
-
-  private removeToken(): void {
-    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  }
-
-  async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
-    const response = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error en el login');
-    }
-
-    const data = await response.json();
-    this.setToken(data.access_token);
-    
-    // Obtener perfil del usuario
-    const user = await this.getProfile();
-    return { user, token: data.access_token };
-  }
-
-  async register(userData: RegisterData): Promise<User> {
-    const response = await fetch(`${API_BASE}/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...userData,
-        avatar: userData.avatar || 'https://i.pravatar.cc/300',
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Error en el registro');
-    }
-
-    return await response.json();
-  }
-
-  async getProfile(): Promise<User> {
-    const token = this.getToken();
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
-
-    const response = await fetch(`${API_BASE}/auth/profile`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        this.removeToken();
-        throw new Error('Token expirado');
-      }
-      throw new Error('Error al obtener el perfil');
-    }
-
-    return await response.json();
-  }
-
-  async refreshToken(): Promise<User | null> {
-    try {
-      return await this.getProfile();
-    } catch (error) {
-      this.removeToken();
-      return null;
-    }
-  }
-
-  logout(): void {
-    this.removeToken();
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.getToken();
-  }
-}
-
-export const authService = new AuthService();
-
-// hooks/useAuthLogic.ts
-import { useState, useCallback } from 'react';
-import { authService } from '~/services/authService';
-import type { User, LoginCredentials, RegisterData, AuthState } from '~/types/auth';
-
-export const useAuthLogic = () => {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    isAuthenticated: false,
-    isLoading: true,
-    error: null,
-  });
-
-  const setLoading = (isLoading: boolean) => {
-    setState(prev => ({ ...prev, isLoading }));
-  };
-
-  const setError = (error: string | null) => {
-    setState(prev => ({ ...prev, error }));
-  };
-
-  const setUser = (user: User | null) => {
-    setState(prev => ({
-      ...prev,
-      user,
-      isAuthenticated: !!user,
-      isLoading: false,
-      error: null,
-    }));
-  };
-
-  const login = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const { user } = await authService.login(credentials);
-      setUser(user);
-      return true;
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error en el login');
-      setLoading(false);
-      return false;
-    }
-  }, []);
-
-  const register = useCallback(async (data: RegisterData): Promise<boolean> => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await authService.register(data);
-      
-      // Después del registro, hacer login automático
-      const loginSuccess = await login({
-        email: data.email,
-        password: data.password,
-      });
-      
-      return loginSuccess;
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error en el registro');
-      setLoading(false);
-      return false;
-    }
-  }, [login]);
-
-  const logout = useCallback(() => {
-    authService.logout();
-    setUser(null);
-  }, []);
-
-  const refreshAuth = useCallback(async (): Promise<void> => {
-    try {
-      setLoading(true);
-      const user = await authService.refreshToken();
-      setUser(user);
-    } catch (error) {
-      setUser(null);
-    }
-  }, []);
-
-  const hasRole = useCallback((role: string): boolean => {
-    return state.user?.role === role;
-  }, [state.user]);
-
-  const hasAnyRole = useCallback((roles: string[]): boolean => {
-    return state.user ? roles.includes(state.user.role) : false;
-  }, [state.user]);
-
-  return {
-    ...state,
-    login,
-    register,
-    logout,
-    refreshAuth,
-    hasRole,
-    hasAnyRole,
-  };
-};
-
-// context/AuthContext.tsx
-import React, { createContext, useContext, useEffect } from 'react';
-import { useAuthLogic } from '~/hooks/useAuthLogic';
-import type { IAuthContextType } from '~/types/auth';
-
-const AuthContext = createContext<IAuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro del AuthProvider');
-  }
-  return context;
-};
-
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const logic = useAuthLogic();
-
+  const [buscador, setBuscador] = useState('');
+  const [todosSeleccionados, setTodosSeleccionados] = useState(false);
+  const [elementosSeleccionados, setElementosSeleccionados] = useState<Set<number>>(new Set());
+  
+  // Buscador
+  // Inicializar datos filtrados cuando cambien los datos
   useEffect(() => {
-    logic.refreshAuth();
-  }, []);
+    setDatosFiltrados(data);
+  }, [data]);
 
-  return (
-    <AuthContext.Provider value={logic}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-// components/ProtectedRoute.tsx
-import { Navigate, useLocation } from 'react-router';
-import { useAuth } from '~/context/AuthContext';
-
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredRoles?: string[];
-  redirectTo?: string;
-}
-
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  children,
-  requiredRoles = [],
-  redirectTo = '/login',
-}) => {
-  const { isAuthenticated, hasAnyRole, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
+  // Efecto para manejar la búsqueda
+  const filterData = (search: string) => {
+    if (!search.trim()) {
+      setDatosFiltrados(data);
+      setPaginaActual(1);
+      return;
+    }
+    
+    // Si hay algún filtro activo
+    const resultado = data.filter((item) =>
+      item.title.toLowerCase().includes(search.toLowerCase()) ||
+        item.description.toLowerCase().includes(search.toLowerCase()) ||
+        (item.category && item.category.toLowerCase().includes(search.toLowerCase()))
     );
+    setDatosFiltrados(resultado);
+    setPaginaActual(1); // Reiniciar a la primera página
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={redirectTo} state={{ from: location }} replace />;
-  }
-
-  if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Acceso Denegado</h1>
-          <p className="text-gray-600">No tienes permisos para ver esta página.</p>
-        </div>
-      </div>
-    );
-  }
-
-  return <>{children}</>;
-};
-
-// pages/Login.tsx
-import { useState } from 'react';
-import { Navigate, useLocation, Link } from 'react-router';
-import { useAuth } from '~/context/AuthContext';
-
-export default function Login() {
-  const { login, isAuthenticated, isLoading, error } = useAuth();
-  const location = useLocation();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-
-  const from = location.state?.from?.pathname || '/dashboard';
-
-  if (isAuthenticated) {
-    return <Navigate to={from} replace />;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await login(formData);
+  // Manejar búsqueda
+  const manejarBusqueda = () => {
+    filterData(buscador);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  // Manejar búsqueda en tiempo real
+  const manejarCambioBusqueda = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valor = e.target.value;
+    setBuscador(valor);
+    filterData(valor);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Iniciar Sesión
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Contraseña</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Contraseña"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+  // fin // Buscador
+  
+  //Seleccion
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
-            </button>
-          </div>
+  // Manejar selección individual
+  const manejarSeleccionIndividual = (id: number) => {
+    const nuevaSeleccion = new Set(elementosSeleccionados);
+    if (nuevaSeleccion.has(id)) {
+      nuevaSeleccion.delete(id);
+    } else {
+      nuevaSeleccion.add(id);
+    }
+    setElementosSeleccionados(nuevaSeleccion);
+    setTodosSeleccionados(nuevaSeleccion.size === empleadosFiltradasPaginadas.length);
+  };
 
-          <div className="text-center">
-            <Link
-              to="/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              ¿No tienes cuenta? Regístrate
-            </Link>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
-// pages/Register.tsx
-import { useState } from 'react';
-import { Navigate, Link } from 'react-router';
-import { useAuth } from '~/context/AuthContext';
-
-export default function Register() {
-  const { register, isAuthenticated, isLoading, error } = useAuth();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [validationError, setValidationError] = useState('');
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setValidationError('Las contraseñas no coinciden');
+  // Manejar seleccionar todos
+  const manejarSeleccionarTodos = () => {
+    if (todosSeleccionados) {
+      setElementosSeleccionados(new Set());
+      setTodosSeleccionados(false);
+    } else {
+      const nuevaSeleccion = new Set(empleadosFiltradasPaginadas.map(item => item.id));
+      setElementosSeleccionados(nuevaSeleccion);
+      setTodosSeleccionados(true);
+    }
+  };
+ //Seleccion fin
+ 
+  // Efecto para manejar la paginación
+  useEffect(() => {
+    if (!datosFiltrados || datosFiltrados.length === 0) {
+      SetEmpleadosFiltradasPaginadas([]);
       return;
     }
 
-    if (formData.password.length < 6) {
-      setValidationError('La contraseña debe tener al menos 6 caracteres');
-      return;
+    const indiceUltimo = paginaActual * empleadosPorPagina;
+    const indicePrimero = indiceUltimo - empleadosPorPagina;
+    const paginados = datosFiltrados.slice(indicePrimero, indiceUltimo);
+
+    SetEmpleadosFiltradasPaginadas(paginados);
+  }, [datosFiltrados, paginaActual, empleadosPorPagina]);
+
+  // Cálculo Total de Páginas
+  const totalPaginas = Math.ceil(datosFiltrados.length / empleadosPorPagina);
+
+  // Funciones para gestionar cambios de página
+  const cambiarPagina = (numeroPagina: number) => {
+    if (numeroPagina >= 1 && numeroPagina <= totalPaginas) {
+      setPaginaActual(numeroPagina);
+    }
+  };
+
+  const irAPaginaAnterior = () => {
+    cambiarPagina(paginaActual - 1);
+  };
+
+  const irAPaginaSiguiente = () => {
+    cambiarPagina(paginaActual + 1);
+  };
+
+  // Generar números de páginas para mostrar
+  const generarNumerosPaginas = () => {
+    const numeros = [];
+    const maxPaginasVisibles = 5;
+    let inicio = Math.max(1, paginaActual - Math.floor(maxPaginasVisibles / 2));
+    let fin = Math.min(totalPaginas, inicio + maxPaginasVisibles - 1);
+
+    if (fin - inicio + 1 < maxPaginasVisibles) {
+      inicio = Math.max(1, fin - maxPaginasVisibles + 1);
     }
 
-    await register({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    });
+    for (let i = inicio; i <= fin; i++) {
+      numeros.push(i);
+    }
+    return numeros;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+  // Formatear fecha
+  const formatearFecha = (fecha: string) => {
+    const date = new Date(fecha);
+    const hoy = new Date();
+    const diferencia = hoy.getTime() - date.getTime();
+    const dias = Math.floor(diferencia / (1000 * 3600 * 24));
+    
+    if (dias === 0) return 'Hoy';
+    if (dias === 1) return 'Ayer';
+    if (dias < 7) return `Hace ${dias} días`;
+    return date.toLocaleDateString();
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Crear Cuenta
-          </h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {(error || validationError) && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error || validationError}
-            </div>
-          )}
-          
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="sr-only">Nombre</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Nombre completo"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="sr-only">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Contraseña</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Contraseña"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="confirmPassword" className="sr-only">Confirmar Contraseña</label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Confirmar contraseña"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+  return(    
+    <section className=" container mx-auto max-w-4xl bg-white  rounded-lg shadow-lg overflow-hidden">
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
-            </button>
-          </div>
+    <div className="message-header  flex items-center justify-between p-4">
+       <h3 className="text-xl font-bold text-gray-800 ">{title}</h3>
+      <div className="flex items-center space-x-3">
+        <button onClick={()=> window.location.reload()}
+        className="text-gray-500 dark:text-gray-400 
+        :text-gray-700 dark:hover:text-gray-200 
+        transition-colors duration-200 ease-in-out"
+        aria-label="Actualizar">
+        <RefreshCw className="h-6 w-6" />
+        </button>
 
-          <div className="text-center">
-            <Link
-              to="/login"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              ¿Ya tienes cuenta? Inicia sesión
-            </Link>
-          </div>
-        </form>
+        {isComponer && (
+        <button
+        onClick={() => alert("Abrir modal")}
+        className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 ease-in-out flex items-center"
+        >
+        <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+        Componer
+        </button>
+        )}
+
       </div>
     </div>
-  );
-}
 
-// pages/Dashboard.tsx
-import { useAuth } from '~/context/AuthContext';
+    {/* Barra de búsqueda */}
+    <div className="search-bar px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex gap-1" >
+        <input 
+          type="text" 
+          placeholder="Buscar mensajes..."
+          value={buscador}
+          onChange={manejarCambioBusqueda}
+         onKeyPress={(e) => e.key === 'Enter' && manejarBusqueda()}
+         className="flex-grow p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900
+          dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"/>
+        <button onClick={manejarBusqueda}
+         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 ease-in-out">Buscar</button>
+    </div>
 
-export default function Dashboard() {
-  const { user, logout, hasRole } = useAuth();
+  {/* Acciones de mensajes */}
+  <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <label className="flex items-center space-x-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={todosSeleccionados}
+            onChange={manejarSeleccionarTodos}
+            className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+          />
+          <span className="text-sm font-medium text-gray-700">Seleccionar todo</span>
+        </label>
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200 ease-in-out">
+          Archivar
+        </button>
+        <button className="px-3 py-1 bg-yellow-600 text-white rounded-md text-sm hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors duration-200 ease-in-out">
+          Borrador
+        </button>
+        <button className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 ease-in-out">
+          Leído
+        </button>
+        <button className="px-3 py-1 bg-gray-600 text-white rounded-md text-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200 ease-in-out">
+          No Leído
+        </button>
+      </div>
+    </div>
+    {/* Contenido principal */}
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold">Dashboard</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <img
-                className="h-8 w-8 rounded-full"
-                src={user?.avatar}
-                alt={user?.name}
-              />
-              <span className="text-sm font-medium text-gray-700">{user?.name}</span>
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
+       <div className="bg-white" style={{ minHeight: '400px', maxHeight: '600px' }}>
+      {messageError && (
+        <div className="text-center p-8 text-red-500 border-t border-gray-200">
+          {messageError}
         </div>
-      </nav>
+      )}
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              ¡Bienvenido, {user?.name}!
-            </h2>
-            <div className="space-y-4">
-              <p><strong>Email:</strong> {user?.email}</p>
-              <p><strong>Rol:</strong> {user?.role}</p>
-              
-              {hasRole('admin') && (
-                <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded">
-                  <p><strong>Permisos de Administrador:</strong> Puedes acceder a todas las funciones.</p>
+      {!messageError && (
+        <>
+          {/* Lista de mensajes */}
+          <div className="divide-y divide-gray-200">
+            {empleadosFiltradasPaginadas && empleadosFiltradasPaginadas.length > 0 ? (
+              empleadosFiltradasPaginadas.map((product) => (
+                <div key={product.id} className="p-4 hover:bg-gray-50 transition-colors duration-150">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={elementosSeleccionados.has(product.id)}
+                      onChange={() => manejarSeleccionIndividual(product.id)}
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                    <button className="text-gray-400 hover:text-yellow-500 transition-colors duration-150 ease-in-out">
+                      <Star className="h-4 w-4" />
+                    </button>
+                    <img
+                      alt="Avatar"
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                      src={product.image}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="text-sm font-semibold text-gray-900 truncate">
+                          {product.category || 'General'}
+                        </span>
+                        <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                          NUEVO
+                        </span>
+                      </div>
+                      <p className="text-gray-800 font-medium truncate mb-1">
+                        {product.title}
+                      </p>
+                      <p className="text-gray-600 text-sm truncate">
+                        {product.description}
+                      </p>
+                    </div>
+                    <span className="text-sm text-gray-500 flex-shrink-0 ml-4">
+                      {/* {formatearFecha(product.)} */}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                {buscador ? 'No se encontraron resultados para tu búsqueda.' : 'No hay mensajes disponibles.'}
+              </div>
+            )}
           </div>
-        </div>
-      </main>
+
+          {/* Paginación */}
+          {datosFiltrados && datosFiltrados.length > empleadosPorPagina && (
+            <div className="px-4 py-4 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between">
+                {/* Información de elementos */}
+                <div className="text-sm text-gray-700">
+                  Mostrando {(paginaActual - 1) * empleadosPorPagina + 1} a{' '}
+                  {Math.min(paginaActual * empleadosPorPagina, datosFiltrados.length)} de {datosFiltrados.length} elementos
+                </div>
+
+                {/* Controles de paginación */}
+                <div className="flex items-center space-x-2">
+                  {/* Botón anterior */}
+                  <button
+                    onClick={irAPaginaAnterior}
+                    disabled={paginaActual === 1}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                      paginaActual === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Anterior
+                  </button>
+
+                  {/* Números de página */}
+                  <div className="flex space-x-1">
+                    {generarNumerosPaginas().map((numeroPagina) => (
+                      <button
+                        key={numeroPagina}
+                        onClick={() => cambiarPagina(numeroPagina)}
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                          numeroPagina === paginaActual
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {numeroPagina}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Botón siguiente */}
+                  <button
+                    onClick={irAPaginaSiguiente}
+                    disabled={paginaActual === totalPaginas}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                      paginaActual === totalPaginas
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    Siguiente
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
-  );
+    </section>
+
+)
+
 }
 
-// routes.tsx (ejemplo de configuración de rutas)
-import { Routes, Route } from 'react-router';
-import { AuthProvider } from '~/context/AuthContext';
-import { ProtectedRoute } from '~/components/ProtectedRoute';
-import Login from '~/pages/Login';
-import Register from '~/pages/Register';
-import Dashboard from '~/pages/Dashboard';
 
-export default function AppRoutes() {
-  return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute requiredRoles={['admin']}>
-              <div>Panel de Administrador</div>
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-    </AuthProvider>
-  );
-}
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Mensajería Refactorizado - Componentes Reutilizables</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* ===========================================
+           COMPONENTES BASE REUTILIZABLES
+        =========================================== */
+        
+        /* Botones */
+        .btn {
+            @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+        }
+
+        .btn-primary {
+            @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+        }
+
+        .btn-secondary {
+            @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
+        }
+
+        .btn-danger {
+            @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+        }
+
+        .btn-ghost {
+            @apply btn bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-500 dark:text-gray-400 dark:hover:bg-gray-800;
+        }
+
+        .btn-icon {
+            @apply p-2 rounded-full;
+        }
+
+        /* Cards */
+        .card {
+            @apply bg-white rounded-lg shadow-md overflow-hidden transition-shadow duration-200 dark:bg-gray-800;
+        }
+
+        .card-hover {
+            @apply card hover:shadow-lg;
+        }
+
+        .card-header {
+            @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700;
+        }
+
+        .card-body {
+            @apply p-6;
+        }
+
+        .card-footer {
+            @apply px-6 py-4 border-t border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            @apply flex-shrink-0 w-64 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out overflow-hidden relative z-20 dark:bg-gray-800 dark:border-gray-700;
+        }
+
+        .sidebar-collapsed {
+            @apply w-16;
+        }
+
+        .sidebar-header {
+            @apply flex items-center justify-center h-16 border-b border-gray-200 px-4 dark:border-gray-700;
+        }
+
+        .sidebar-nav {
+            @apply mt-4 overflow-y-auto;
+            max-height: calc(100% - 64px);
+        }
+
+        .sidebar-item {
+            @apply flex items-center py-3 px-4 rounded-lg text-gray-700 hover:bg-gray-50 mx-2 mb-2 transition-colors duration-200 ease-in-out dark:text-gray-200 dark:hover:bg-gray-700;
+        }
+
+        .sidebar-item-active {
+            @apply sidebar-item text-blue-700 bg-blue-50 font-semibold dark:bg-blue-900 dark:text-blue-100;
+        }
+
+        .sidebar-icon {
+            @apply h-6 w-6 mr-3 flex-shrink-0 text-gray-600 dark:text-gray-300;
+        }
+
+        .sidebar-text {
+            @apply text-nowrap transition-all duration-300 ease-in-out;
+        }
+
+        /* Messages/Items Lists */
+        .message-list {
+            @apply divide-y divide-gray-200 dark:divide-gray-700;
+        }
+
+        .message-item {
+            @apply flex items-start p-4 hover:bg-gray-50 cursor-pointer transition-colors duration-200 dark:hover:bg-gray-800;
+        }
+
+        .message-item-unread {
+            @apply message-item bg-blue-50 border-l-4 border-blue-500 dark:bg-blue-900 dark:bg-opacity-20;
+        }
+
+        .message-avatar {
+            @apply w-12 h-12 rounded-full object-cover mr-4 flex-shrink-0;
+        }
+
+        .message-content {
+            @apply flex-1 min-w-0;
+        }
+
+        .message-title {
+            @apply text-lg font-semibold text-gray-900 mb-1 dark:text-gray-100;
+        }
+
+        .message-subtitle {
+            @apply text-sm text-gray-600 mb-2 dark:text-gray-300;
+        }
+
+        .message-preview {
+            @apply text-sm text-gray-500 line-clamp-2 dark:text-gray-400;
+        }
+
+        .message-meta {
+            @apply flex items-center justify-between mt-2;
+        }
+
+        .message-date {
+            @apply text-xs text-gray-400 dark:text-gray-500;
+        }
+
+        /* Notifications */
+        .notification-panel {
+            @apply absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl overflow-hidden z-40 max-h-96 overflow-y-auto dark:bg-gray-800;
+        }
+
+        .notification-header {
+            @apply flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700;
+        }
+
+        .notification-item {
+            @apply p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors dark:border-gray-700 dark:hover:bg-gray-700;
+        }
+
+        .notification-title {
+            @apply font-medium text-gray-900 mb-1 dark:text-gray-100;
+        }
+
+        .notification-content {
+            @apply text-sm text-gray-600 dark:text-gray-300;
+        }
+
+        .notification-time {
+            @apply text-xs text-gray-400 mt-1 dark:text-gray-500;
+        }
+
+        /* Status Indicators */
+        .status-badge {
+            @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+        }
+
+        .status-unread {
+            @apply status-badge bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200;
+        }
+
+        .status-important {
+            @apply status-badge bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200;
+        }
+
+        /* Loading States */
+        .loading-container {
+            @apply flex items-center justify-center p-8 text-gray-500 dark:text-gray-400;
+        }
+
+        .loading-spinner {
+            @apply animate-spin h-5 w-5 text-blue-600;
+        }
+
+        /* Scrollbar personalizado */
+        .scrollbar-custom {
+            scrollbar-width: thin;
+            scrollbar-color: #9ca3af #e5e7eb;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .dark .scrollbar-custom::-webkit-scrollbar-track {
+            background: #374151;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: #9ca3af;
+            border-radius: 10px;
+        }
+
+        .dark .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: #6b7280;
+        }
+
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        .dark .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        /* Text utilities */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                height: 100vh;
+                z-index: 30;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+        }
+
+        .modal-backdrop {
+            @apply fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-40;
+        }
+
+        .modal-dialog {
+            @apply bg-white rounded-lg shadow-xl overflow-hidden transform transition-all z-50 dark:bg-gray-800;
+        }
+
+        .modal-header {
+            @apply flex items-center p-4 border-b border-gray-200 dark:border-gray-700;
+        }
+
+        .modal-title {
+            @apply text-xl font-semibold text-gray-800 flex-1 dark:text-gray-100;
+        }
+
+        .modal-body {
+            @apply p-4;
+        }
+
+        .modal-footer {
+            @apply flex justify-end space-x-3 p-4 border-t border-gray-200 dark:border-gray-700;
+        }
+
+        /* Form */
+        .form-group {
+            @apply mb-4;
+        }
+
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300;
+        }
+
+        .form-input {
+            @apply block w-full rounded-md shadow-sm border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden antialiased text-gray-800 bg-gray-100 transition-colors duration-300 ease-in-out" id="app">
+
+    <!-- Sidebar Component -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <img src="https://via.placeholder.com/40/0A67FB/FFFFFF?text=L" alt="Logo App" class="w-10 h-10 rounded-lg mr-3 transition-all duration-300 ease-in-out sidebar-logo">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 transition-all duration-300 ease-in-out sidebar-title">ChatPro</h1>
+            <button id="sidebarToggleDesktop" class="btn-ghost btn-icon absolute right-4 top-4 hidden md:block">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav scrollbar-custom">
+            <a href="#" class="sidebar-item">
+                <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0v-4a1 1 0 011-1h2a1 1 0 011 1v4m-6 0h6"></path>
+                </svg>
+                <span class="sidebar-text">Inicio</span>
+            </a>
+            <a href="#" class="sidebar-item-active">
+                <svg class="sidebar-icon text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                </svg>
+                <span class="sidebar-text">Mensajes</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H2v-2a3 3 0 015.356-1.857M17 20v-2c0-.653-.105-1.294-.306-1.898M2 10a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2v-8zm8-2a4 4 0 100-8 4 4 0 000 8zm0 0v10"></path>
+                </svg>
+                <span class="sidebar-text">Contactos</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                </svg>
+                <span class="sidebar-text">Archivo</span>
+            </a>
+            <a href="#" class="sidebar-item">
+                <svg class="sidebar-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37h.003zM12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+                </svg>
+                <span class="sidebar-text">Configuración</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex flex-col flex-grow overflow-hidden">
+        <!-- Header Component -->
+        <header class="flex-shrink-0 flex items-center justify-between h-16 px-4 shadow-sm bg-white dark:bg-gray-800 relative z-10">
+            <div class="flex items-center">
+                <button id="sidebarToggleMobile" class="btn-ghost btn-icon md:hidden">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 ml-3">Bandeja de Entrada</h2>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <!-- Notifications Dropdown -->
+                <div class="relative" id="notificationsDropdown">
+                    <button id="notificationsToggle" class="btn-ghost btn-icon relative" aria-label="Notificaciones">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.055-.595 1.405L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span id="notificationCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">3</span>
+                    </button>
+                    
+                    <div id="notificationsPanel" class="notification-panel hidden">
+                        <div class="notification-header">
+                            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Notificaciones</h3>
+                            <button id="closeNotifications" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div id="notificationsList">
+                            <div class="notification-item">
+                                <div class="notification-title">Nuevo mensaje recibido</div>
+                                <div class="notification-content">Juan Pérez te ha enviado un mensaje</div>
+                                <div class="notification-time">Hace 5 minutos</div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-title">Mensaje enviado</div>
+                                <div class="notification-content">Tu mensaje ha sido entregado correctamente</div>
+                                <div class="notification-time">Hace 1 hora</div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-title">Recordatorio</div>
+                                <div class="notification-content">Tienes 2 mensajes sin leer</div>
+                                <div class="notification-time">Hace 2 horas</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center p-2 border-t border-gray-200 dark:border-gray-700">
+                            <a href="#" class="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline">Ver todas las notificaciones</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Button -->
+                <button class="btn-ghost btn-icon relative" aria-label="Mensajes">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                    </svg>
+                    <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-blue-100 transform translate-x-1/2 -translate-y-1/2 bg-blue-600 rounded-full">2</span>
+                </button>
+
+                <!-- Dark Mode Toggle -->
+                <button id="darkModeToggle" class="btn-ghost btn-icon" aria-label="Cambiar tema">
+                    <svg id="moonIcon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                    <svg id="sunIcon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h1M3 12H2m8.05-8.05l-.707-.707M16.95 16.95l.707.707M8.05 16.95l-.707.707M16.95 8.05l.707-.707M12 7a5 5 0 110 10 5 5 0 010-10z"></path>
+                    </svg>
+                </button>
+
+                <!-- User Menu -->
+                <div class="relative" id="userMenuDropdown">
+                    <button id="userMenuToggle" class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
+                        <img class="h-10 w-10 rounded-full object-cover" src="https://via.placeholder.com/40/0A67FB/FFFFFF?text=JP" alt="User Avatar">
+                    </button>
+                    <div id="userMenuPanel" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-40 hidden">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mi Perfil</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Configuración</a>
+                        <div class="border-t border-gray-100 dark:border-gray-700"></div>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-4 overflow-y-auto scrollbar-custom">
+            <div class="container mx-auto max-w-4xl">
+                <!-- Messages Container -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-100">Bandeja de Entrada</h3>
+                            <div class="flex items-center space-x-3">
+                                <button id="refreshMessages" class="btn-ghost btn-icon" aria-label="Actualizar">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11.318 4a8.001 8.001 0 01-15.356 2m0 0H5m5.356-2H4.582"></path>
+                                    </svg>
+                                </button>
+                                <button class="btn-ghost btn-icon" aria-label="Configuración">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37h.003zM12 15a3 3 0 100-6 3 3 0 000 6z"></path>
+                                    </svg>
+                                </button>
+                                <button id="openNewMessageModalBtn" class="btn-primary">
+                                    <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Componer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="messagesLoading" class="loading-container">
+                        <svg class="loading-spinner" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="ml-2">Cargando mensajes...</span>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="messagesError" class="text-center p-8 text-red-500 hidden">
+                        <div class="text-lg font-semibold mb-2">Error al cargar mensajes</div>
+                        <div class="text-sm">Por favor, intenta nuevamente más tarde</div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="noMessages" class="text-center p-8 text-gray-500 dark:text-gray-400 hidden">
+                        <svg class="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2

@@ -63,40 +63,12 @@ export const notificationsPanel = (
   </>
 );
 
-export const panelUser  = (
+export const panelUser = (
 <>
-{/* <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mi Perfil</a>
-<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Configuración</a>
-<div className="border-t border-gray-100 dark:border-gray-700"></div>
-<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a> */}
-
-
-{/* <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-3">
-            <img
-              className="w-8 h-8 rounded-full"
-              src={user?.avatar || "https://i.pravatar.cc/32"}
-              alt={user?.name}
-            />
-            <div className="hidden md:block">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                {user?.name}
-              </p>
-              <p className="text-xs text-gray-500 capitalize">
-                {user?.role}
-              </p>
-            </div>
-          </div>
-          
-          <button
-            onClick={logout}
-            className="px-3 py-2 text-sm font-medium text-white bg-red-600 
-              rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Cerrar Sesión
-          </button>
-        </div> */}
-
+<a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Mi Perfil</a>
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Configuración</a>
+                    <div className="border-t border-gray-100 dark:border-gray-700"></div>
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Cerrar Sesión</a>
 </>
 );
 
