@@ -1,10 +1,11 @@
 import type { Route } from "../../+types/root";
+
+import { useEffect, useState } from "react";
 import { DataGrid } from "~/Components/shared/DataGrid/DataGrid";
-import { useFetch } from "~/hook/useFetchHook";
+
+import { useApiContext } from "~/context/Data/ApiContext";
 import { PageProductosDesktop } from "~/features/productos/desktop/page.productos.desktop";
 import { PageProductosMovil } from "~/features/productos/movil/page.productos.movil";
-import { useProductLogic } from "~/logic/useProductos";
-import { useEffect, useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,14 +15,12 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Productos() {
-    // const { data, errors, isLoading } = useFetch<IProduct>("https://api.escuelajs.co/api/v1/products");
-    // ✅ Verificar que data existe y es un array antes de usar map
-      const { getProductos, productos, isLoading, error } = useProductLogic();
+    const {products,productsLoading,productsError,getProducts} = useApiContext();
   const [viewMode, setViewMode] = useState("table");
   const [isOpenModal,setIsOpenModal] = useState(false);
-        useEffect(() => {
-        getProductos();
-      }, [getProductos]);
+  useEffect(() => {
+    getProducts();
+  }, [getProducts]);
 
     const actions:IActionsDataBody = {
         isStarred: true,
@@ -31,7 +30,9 @@ export default function Productos() {
         viewMode:viewMode,
         setViewMode:setViewMode
     }
-     const producto: IProduct[] = productos || [];
+    
+    
+    const producto: IProduct[] =     products || [];
 
     const productosFilterConfig: IFilterConfig<IProduct> = {
         searchFields:[],
@@ -59,7 +60,7 @@ export default function Productos() {
         },
         dataBody:{
             data:producto,
-                isLoading:isLoading,
+                isLoading:productsLoading,
             errors:null,
                 renderDesktop: (product) => (
                     <>
@@ -82,4 +83,6 @@ export default function Productos() {
             <DataGrid  {...IdataGridProps} />
         </>
     );
+
+
 }

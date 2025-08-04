@@ -16,21 +16,12 @@ export const PageProductosDesktop: React.FC<PageProductosDesktopProps> = ({ prod
   const navigate = useNavigate();
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const handleClick=()=>{
-    navigate(`/Detalle/Productos/${id}`); 
-  }
+
  const handleView = () => {
         navigate(`/dashboard/Productos/Detalle/${id}`, { state: { product } }); // ✅ Navegación con estado
   };
 
-  const handleEdit = () => {
-    navigate(`/productos/${id}/edit`);
-  };
-
-  const handleDelete = () => {
-    // Lógica para eliminar
-    console.log("Eliminar producto:", id);
-  };
+ 
     const formatDate = (dateString?: string) =>
     dateString
       ? new Date(dateString).toLocaleDateString("es-EC", {

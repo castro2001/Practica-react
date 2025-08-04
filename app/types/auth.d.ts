@@ -53,20 +53,33 @@ interface IAuthContextType extends AuthState {
 }
 
 interface IApiContextState {
-    // Products
+// Products state
   products: IProduct[];
   productsLoading: boolean;
   productsError: string | null;
   
-  // Categories
+  // Categories state
   categories: ICategory[];
   categoriesLoading: boolean;
   categoriesError: string | null;
   
-  // Single product (for details)
+  // Single product state
   currentProduct: IProduct | null;
   productLoading: boolean;
   productError: string | null;
+
+  // Functions
+  getProducts: () => Promise<boolean>;
+  getCategories: () => Promise<boolean>;
+  getProduct: (id: number) => Promise<boolean>;
+  updateProduct: (productData: IProduct) => Promise<boolean>;
+  clearProductsError: () => void;
+  clearCategoriesError: () => void;
+  clearProductError: () => void;
+  resetProducts: () => void;
+  resetCurrentProduct: () => void;
+
+
 }
 
 type ApiAction =   // Products actions

@@ -10,6 +10,8 @@ import { CardPreload } from "~/Components/ui/CardPreload/CardPreload";
 import { themesProductos } from "~/data/themes/producto";
 import { themesUsuarios } from "~/data/themes/usuario";
 import { CardHeader } from "~/Components/ui/CardHeader/CardHeader";
+import { useApiContext } from "~/context/Data/ApiContext";
+import { useEffect } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -19,27 +21,26 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Detalle() {
-  const { tipo, id } = useParams();
+const { tipo, id } = useParams();
   const location = useLocation();
- 
+  const {getProduct,currentProduct,productLoading,productError} = useApiContext();
+
   const [themeUsuario1,themeUsuario2,themeUsuario3]= themesUsuarios
   const [themeProducto1, themeProducto2, themeProducto3,themeProducto4] = themesProductos;
+
 
   // Datos opcionales desde navegación
   const dataState = location.state?.data;
 
-  // Mapa de endpoints
-  const endpointMap: Record<string, string> = {
-    Usuario: "https://api.escuelajs.co/api/v1/users/",
-    Productos: "https://api.escuelajs.co/api/v1/products/",
-  };
+  useEffect(() => {
+    if (id) {
+      getProduct(Number(id));
+    }
+  }, [getProduct, id]); // ✅ DEPENDENCIAS CORRECTAS
 
-  // Carga dinámica sólo si no vino desde navegación
-  const endpoint = tipo && id && !dataState ? `${endpointMap[tipo]}${id}` : "";
-  const { data: fetchedData, errors, isLoading } = useFetch<any>(endpoint);
-  const finalData = dataState || fetchedData;
-  
-  console.log(finalData);
+  console.log('Current Product:', currentProduct);
+  console.log('Product Loading:', productLoading);
+  console.log('Product Error:', productError);
 
   // ✅ Función helper para validar si una URL de imagen es válida
   const isValidImageUrl = (url: string): boolean => {
@@ -77,14 +78,14 @@ export default function Detalle() {
 
   // ✅ Función helper para construir el contenido
   const buildContent = () => {
-    if (!finalData) return "Cargando información...";
+    if (!currentProduct) return "Cargando información...";
 
     switch (tipo) {
       case "Usuario":
-        return `Perfil de ${finalData.name || 'Usuario'} • ${finalData.role || 'Sin rol'} • Contacto: ${finalData.email || 'No disponible'}`;
+        return `Perfil de ${currentProduct.name || 'Usuario'} • ${currentProduct.role || 'Sin rol'} • Contacto: ${currentProduct.email || 'No disponible'}`;
 
       case "Productos":
-        return `${finalData.description || 'Sin descripción disponible'}`;
+        return `${currentProduct.description || 'Sin descripción disponible'}`;
 
       default:
         return "Información no disponible";
@@ -93,27 +94,27 @@ export default function Detalle() {
 
   // ✅ Función helper mejorada para construir el array de imágenes
   const buildImages = (): string[] => {
-    if (!finalData) return [Logo];
+    if (!currentProduct) return [Logo];
 
     switch (tipo) {
       case "Usuario":
-        const avatarUrl = cleanAndValidateImageUrl(finalData.avatar);
+        const avatarUrl = cleanAndValidateImageUrl(currentProduct.avatar);
         return [avatarUrl];
 
       case "Productos":
         const validImages: string[] = [];
         
         // Procesar imágenes del producto
-        if (Array.isArray(finalData.images)) {
-          finalData.images.forEach((img: any) => {
+        if (Array.isArray(currentProduct.images)) {
+          currentProduct.images.forEach((img: any) => {
             const validUrl = cleanAndValidateImageUrl(img);
             validImages.push(validUrl);
           });
         }
         
         // Procesar imagen de categoría
-        if (finalData.category?.image) {
-          const categoryImageUrl = cleanAndValidateImageUrl(finalData.category.image);
+        if (currentProduct.category?.image) {
+          const categoryImageUrl = cleanAndValidateImageUrl(currentProduct.category.image);
           validImages.push(categoryImageUrl);
         }
         
@@ -130,7 +131,7 @@ export default function Detalle() {
     content: buildContent(),
   };
 
-  if (isLoading) {
+  if (productLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900">
         <div className="container mx-auto px-4 py-8">
@@ -147,7 +148,7 @@ export default function Detalle() {
     );
   }
 
-  if (errors) {
+  if (productError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900 dark:to-pink-900 flex items-center justify-center">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md">
@@ -176,13 +177,13 @@ export default function Detalle() {
 
         />
 
-        {finalData && tipo && (
+        {currentProduct && tipo && (
           <>
             {/* Hero Section con Welcome */}
             <div className="mb-8">
               <Welcome 
-                key={finalData.id || id}
-                title={finalData.title || finalData.name || `Detalles de ${tipo}`} 
+                key={currentProduct.id || id}
+                title={currentProduct.title || currentProduct.name || `Detalles de ${tipo}`} 
                 descripcion={descripcion} 
                 image={buildImages()}
               />
@@ -198,21 +199,21 @@ export default function Detalle() {
                     <Card  titulo="Precio" 
                     subtitulo="Valor del producto" 
                     icon={<DollarSign className="w-6 h-6 text-white" />} 
-                    content={ finalData.price || 0} 
+                    content={ currentProduct.price || 0} 
                     themes={themeProducto1}
                     />
 
                     <Card  titulo="Categoría" 
                     subtitulo="Clasificación" 
                     icon={<Tag className="w-6 h-6 text-white" />} 
-                    content={finalData.category?.name || 'Sin categoría'} 
+                    content={currentProduct.category?.name || 'Sin categoría'} 
                         themes={themeProducto2}
                     />
 
                     <Card  titulo="Creado" 
                     subtitulo="Fecha de registro" 
                     icon={<Calendar className="w-6 h-6 text-white" />} 
-                    content={finalData.creationAt ? new Date(finalData.creationAt).toLocaleDateString('es-ES', {
+                    content={currentProduct.creationAt ? new Date(currentProduct.creationAt).toLocaleDateString('es-ES', {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
@@ -233,21 +234,21 @@ export default function Detalle() {
                   <Card  titulo="Nombre" 
                   subtitulo="Información personal" 
                   icon={<User className="w-6 h-6 text-white" />} 
-                  content={finalData.name || 'No disponible'} 
+                  content={currentProduct.name || 'No disponible'} 
                   themes={themeUsuario1}
                   />
 
                   <Card  titulo="Email" 
                   subtitulo="Correo Electrónico" 
                   icon={<User className="w-6 h-6 text-white" />} 
-                  content={finalData.email || 'No disponible'} 
+                  content={currentProduct.email || 'No disponible'} 
                      themes={themeUsuario2}
                   />
             
                   <Card  titulo="Rol" 
                   subtitulo="Permiso de usuario" 
                   icon={<User className="w-6 h-6 text-white" />} 
-                  content={finalData.role || 'No disponible'} 
+                  content={currentProduct.role || 'No disponible'} 
                      themes={themeUsuario3}
                   />
                    </>  
@@ -255,11 +256,11 @@ export default function Detalle() {
             )}
 
             {/* Descripción completa en card separada */}
-            {finalData.description && tipo === "Productos" && (
+            {currentProduct.description && tipo === "Productos" && (
               <Card  titulo="Descripción Completas" 
               subtitulo="" 
               icon={<Star className="w-4 h-4 text-white" />} 
-              content={finalData.description}
+              content={currentProduct.description}
               themes={themeProducto4}
               />
 
@@ -268,7 +269,7 @@ export default function Detalle() {
           </>
         )}
 
-        {!finalData && !isLoading && (
+        {!currentProduct && !productLoading && (
           <CardPreload 
             titulo="No hay datos"
             subtitulo="No se encontraron datos para mostrar."

@@ -25,6 +25,8 @@ export default function Productos() {
     getProductos();
   }, [getProductos]);
 
+  const producto: IProduct[] = productos || [];
+
   const productosFilterConfig: IFilterConfig<IProduct> = {
     customFilter: (producto, searchTerm) => {
       const term = searchTerm.toLowerCase();
@@ -37,8 +39,8 @@ export default function Productos() {
   };
 
   const dataFiltrada = useMemo(() => {
-    if (isLoading || error || !productos?.length) return [];
-    let resultado = [...productos];
+    if (isLoading || error || !producto?.length) return [];
+    let resultado = [...producto];
 
     if (terminoBusqueda && productosFilterConfig.customFilter) {
       resultado = resultado.filter((producto) =>

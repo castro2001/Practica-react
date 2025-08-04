@@ -6,10 +6,22 @@ export class ProductosService{
         this.api = ApiService.getInstance();
     }
 
-    async getProductos(id:string= ''): Promise<IProduct> {
+    async getProductos(): Promise<IProduct[]> {
         try {
-            const url = id !='' ? `/products/${id}` : '/products';
-            const response = await this.api.get<IProduct>(url)
+             
+            const response = await this.api.get<IProduct[]>('/products')
+            return await response;
+        } catch (error) {
+            throw error;
+        }
+        
+    
+    }
+
+    
+    async getProducto(id:number=0): Promise<IProduct> {
+        try {
+            const response = await this.api.get<IProduct>(`/products/${id}`)
             return await response;
         } catch (error) {
             throw error;

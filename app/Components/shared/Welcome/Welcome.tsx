@@ -50,7 +50,7 @@ export const Welcome = (props: IWelcome) => {
       if(!hasMultipleImages) return;
       const loop  = setInterval(()=>{
         setCurrentImageIndex((prev)=> (prev + 1 ) % imageArray.length )
-      },1000)
+      },2000)
 
       return ()=> clearInterval(loop);
     },[imageArray.length, hasMultipleImages])
