@@ -1,6 +1,8 @@
 import { Welcome } from "~/Components/shared/Welcome/Welcome"; 
 import type { Route } from "./+types/home"; 
 import Logo from "~/assets/image/logo.png";
+import { useAuth } from '~/context/Auth/authContext'; 
+import { Navigate } from "react-router";
 
 export function meta({}: Route.MetaArgs) {   
     return [     
@@ -10,6 +12,7 @@ export function meta({}: Route.MetaArgs) {
 }  
 
 export default function Home() {  
+      const { isAuthenticated, isLoading } = useAuth();
     const iWelcome : IWelcome= {
         title:"Bienvenido Usuario",
         descripcion:{
@@ -18,9 +21,16 @@ export default function Home() {
         image:Logo
     }  
 
-    return (     
-        <>                     
-            <Welcome  {...iWelcome}/>      
-        </>   
-    );        
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? 
+    <Navigate to="/dashboard" replace /> : 
+    <Navigate to="/login" replace />;
+       
 }

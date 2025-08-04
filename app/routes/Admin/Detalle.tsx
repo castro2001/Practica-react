@@ -1,5 +1,5 @@
 import { Welcome } from "~/Components/shared/Welcome/Welcome";
-import type { Route } from "./+types/home";
+import type { Route } from "../+types/home";
 import Logo from "~/assets/image/background_default.png";
 import { useParams, useLocation } from "react-router";
 import { useFetch } from "~/hook/useFetchHook";

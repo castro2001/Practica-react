@@ -1,4 +1,4 @@
-import type { Route } from "../+types/root";
+import type { Route } from "../../+types/root";
 import { DataGrid } from "~/Components/shared/DataGrid/DataGrid"; 
 import { useFetch } from "~/hook/useFetchHook";
 import { PageUsuarioDesktop } from "~/features/Usuario/desktop/page.usuario.desktop";

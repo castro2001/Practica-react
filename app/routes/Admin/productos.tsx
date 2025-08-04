@@ -1,8 +1,10 @@
-import type { Route } from "../+types/root";
-import { DataGrid } from "~/Components/shared/DataGrid/DataGrid"; 
+import type { Route } from "../../+types/root";
+import { DataGrid } from "~/Components/shared/DataGrid/DataGrid";
 import { useFetch } from "~/hook/useFetchHook";
 import { PageProductosDesktop } from "~/features/productos/desktop/page.productos.desktop";
 import { PageProductosMovil } from "~/features/productos/movil/page.productos.movil";
+import { useProductLogic } from "~/logic/useProductos";
+import { useEffect, useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -12,16 +14,24 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Productos() {
-    const { data, errors, isLoading } = useFetch<IProduct>("https://api.escuelajs.co/api/v1/products");    
+    // const { data, errors, isLoading } = useFetch<IProduct>("https://api.escuelajs.co/api/v1/products");
     // ✅ Verificar que data existe y es un array antes de usar map
-    const productos: IProduct[] = data || [];
+      const { getProductos, productos, isLoading, error } = useProductLogic();
+  const [viewMode, setViewMode] = useState("table");
+  const [isOpenModal,setIsOpenModal] = useState(false);
+        useEffect(() => {
+        getProductos();
+      }, [getProductos]);
 
     const actions:IActionsDataBody = {
         isStarred: true,
         isArchived:false,
         isDraft:false,
-        isRead:false
+        isRead:false,
+        viewMode:viewMode,
+        setViewMode:setViewMode
     }
+     const producto: IProduct[] = productos || [];
 
     const productosFilterConfig: IFilterConfig<IProduct> = {
         searchFields:[],
@@ -34,18 +44,28 @@ export default function Productos() {
         }
     };
 
+
+
     const IdataGridProps : IDataGrid<IProduct> ={
         dataHeader:{
-            title: "Bandeja de Productos",     
-            btn_text: "Redactar",
+            title: "Bandeja de Productos",
+            btn_text: "Crear producto",
             isSearch: true,
+            isOptions:true,
+            viewMode,
+            setViewMode,
+            // modal:Modal
+      
         },
         dataBody:{
-            data:productos,
+            data:producto,
                 isLoading:isLoading,
-            errors:errors,
+            errors:null,
                 renderDesktop: (product) => (
-                    <PageProductosDesktop  product={product}  actions={actions} />
+                    <>
+                    
+                    <PageProductosDesktop  product={product}  actions={actions}  />
+                    </>
                 ),
                 renderMovil: (product) => (
                 <PageProductosMovil  product={product}  actions={actions}  />
@@ -56,10 +76,10 @@ export default function Productos() {
         },
         filterConfig:productosFilterConfig
     }
-    
-    return (     
-        <>     
-            <DataGrid  {...IdataGridProps} />     
-        </>   
-    ); 
+
+    return (
+        <>
+            <DataGrid  {...IdataGridProps} />
+        </>
+    );
 }

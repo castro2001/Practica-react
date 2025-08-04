@@ -6,7 +6,7 @@ interface IProduct{
     description:string;
     category: ICategory;
     images: string[]
-    creationAt: Date;
+    creationAt: Date|string;
     updateAt: Date;
 }
 

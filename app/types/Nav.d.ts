@@ -9,4 +9,5 @@ interface INavItem{
     className?:string;
     clasNameText?:string
     text: string;
+    roles:string[];
 }

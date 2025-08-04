@@ -1,340 +1,807 @@
-<!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diseño Moderno - Modo Claro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'glow': 'glow 2s ease-in-out infinite alternate',
-                        'slide-up': 'slideUp 0.6s ease-out',
-                        'fade-in': 'fadeIn 0.8s ease-out'
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-20px)' }
-                        },
-                        glow: {
-                            '0%': { boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)' },
-                            '100%': { boxShadow: '0 0 30px rgba(99, 102, 241, 0.6)' }
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(50px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' }
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        }
-                    }
-                }
-            }
+// root.tsx - Layout principal con autenticación
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+} from "react-router";
+import type { Route } from "./+types/root";
+import "./app.css";
+import { AuthProvider } from "./context/AuthContext";
+
+export const links: Route.LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+  },
+];
+
+const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [priceRange, setPriceRange] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [viewMode, setViewMode] = useState('grid');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Datos de ejemplo basados en tu imagen
+  const products = [
+    {
+      id: 1,
+      name: "Futuristic Holographic Soccer Cleats",
+      description: "Step onto the field and stand out from the crowd with these eye-catching holographic soccer cleats. Designed for the modern player, these cleats feature a sleek silhouette, lightweight construction for maximum agility, and durable studs for optimal traction.",
+      price: 9989,
+      category: "Shoes",
+      rating: 4.8,
+      reviews: 124,
+      createdDate: "2 de agosto de 2025",
+      image: "https://images.unsplash.com/photo-1584735175315-9d5df23860e6?w=400&h=300&fit=crop",
+      inStock: true,
+      featured: true
+    },
+    {
+      id: 2,
+      name: "Nike Air Max Revolution",
+      description: "Revolutionary design meets ultimate comfort in these premium running shoes with advanced cushioning technology.",
+      price: 7500,
+      category: "Shoes",
+      rating: 4.6,
+      reviews: 89,
+      createdDate: "1 de agosto de 2025",
+      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop",
+      inStock: true,
+      featured: false
+    },
+    {
+      id: 3,
+      name: "Wireless Gaming Headset",
+      description: "Immersive audio experience with crystal-clear communication for competitive gaming sessions.",
+      price: 4200,
+      category: "Electronics",
+      rating: 4.9,
+      reviews: 256,
+      createdDate: "30 de julio de 2025",
+      image: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400&h=300&fit=crop",
+      inStock: true,
+      featured: true
+    },
+    {
+      id: 4,
+      name: "Premium Leather Backpack",
+      description: "Handcrafted leather backpack perfect for professionals who value style and functionality.",
+      price: 12000,
+      category: "Bags",
+      rating: 4.7,
+      reviews: 67,
+      createdDate: "29 de julio de 2025",
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
+      inStock: false,
+      featured: false
+    },
+    {
+      id: 5,
+      name: "Smart Fitness Watch",
+      description: "Track your health and fitness goals with this advanced smartwatch featuring heart rate monitoring.",
+      price: 8900,
+      category: "Electronics",
+      rating: 4.5,
+      reviews: 342,
+      createdDate: "28 de julio de 2025",
+      image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop",
+      inStock: true,
+      featured: true
+    },
+    {
+      id: 6,
+      name: "Classic Denim Jacket",
+      description: "Timeless denim jacket made from premium cotton with a modern fit and vintage appeal.",
+      price: 3500,
+      category: "Clothing",
+      rating: 4.4,
+      reviews: 178,
+      createdDate: "27 de julio de 2025",
+      image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=300&fit=crop",
+      inStock: true,
+      featured: false
+    }
+  ];
+
+  const categories = ['all', 'Shoes', 'Electronics', 'Bags', 'Clothing'];
+  const priceRanges = [
+    { value: 'all', label: 'Todos los precios' },
+    { value: '0-5000', label: '$0 - $5,000' },
+    { value: '5000-10000', label: '$5,000 - $10,000' },
+    { value: '10000+', label: '$10,000+' }
+  ];
+
+  const sortOptions = [
+    { value: 'name', label: 'Nombre' },
+    { value: 'price-low', label: 'Precio: Menor a Mayor' },
+    { value: 'price-high', label: 'Precio: Mayor a Menor' },
+    { value: 'rating', label: 'Mejor Calificación' },
+    { value: 'newest', label: 'Más Recientes' }
+  ];
+
+  const filteredProducts = useMemo(() => {
+    let filtered = products.filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      
+      let matchesPrice = true;
+      if (priceRange !== 'all') {
+        const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
+        if (max) {
+          matchesPrice = product.price >= parseInt(min) && product.price <= parseInt(max);
+        } else {
+          matchesPrice = product.price >= parseInt(min);
         }
-    </script>
-    <style>
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
+      }
+
+      return matchesSearch && matchesCategory && matchesPrice;
+    });
+
+    // Ordenar productos
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'rating':
+          return b.rating - a.rating;
+        case 'newest':
+          return new Date(b.createdDate) - new Date(a.createdDate);
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+
+    return filtered;
+  }, [products, searchTerm, selectedCategory, priceRange, sortBy]);
+
+  // const ProductCard = ({ product }) => (
+  //   <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden ${viewMode === 'list' ? 'flex' : ''}`}>
+  //     {product.featured && (
+  //       <div className="absolute top-3 left-3 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+  //         Destacado
+  //       </div>
+  //     )}
+      
+  //     <div className={`relative ${viewMode === 'list' ? 'w-64 flex-shrink-0' : ''}`}>
+  //       <img 
+  //         src={product.image} 
+  //         alt={product.name}
+  //         className={`w-full object-cover ${viewMode === 'list' ? 'h-48' : 'h-56'}`}
+  //       />
+  //       <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2">
+  //         <Star className="w-4 h-4 text-yellow-500 fill-current" />
+  //       </div>
+  //     </div>
+      
+  //     <div className={`p-6 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+  //       <div className="flex items-start justify-between mb-3">
+  //         <h3 className="text-lg font-bold text-gray-800 line-clamp-2">{product.name}</h3>
+  //         <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+  //           {product.inStock ? 'En Stock' : 'Agotado'}
+  //         </span>
+  //       </div>
         
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+  //       <p className="text-gray-600 text-sm mb-4 line-clamp-3">{product.description}</p>
         
-        .mesh-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-        }
+  //       <div className="flex items-center gap-4 mb-4">
+  //         <div className="flex items-center gap-1">
+  //           <Star className="w-4 h-4 text-yellow-500 fill-current" />
+  //           <span className="text-sm font-medium">{product.rating}</span>
+  //           <span className="text-xs text-gray-500">({product.reviews})</span>
+  //         </div>
+  //         <div className="flex items-center gap-1 text-xs text-gray-500">
+  //           <Calendar className="w-3 h-3" />
+  //           {product.createdDate}
+  //         </div>
+  //       </div>
         
-        @keyframes gradientShift {
-            0% { background-position: 0% 50% }
-            50% { background-position: 100% 50% }
-            100% { background-position: 0% 50% }
-        }
+  //       <div className="flex items-center justify-between">
+  //         <div className="flex items-center gap-1">
+  //           <DollarSign className="w-5 h-5 text-green-600" />
+  //           <span className="text-2xl font-bold text-green-600">${product.price.toLocaleString()}</span>
+  //         </div>
+  //         <div className="flex items-center gap-1 text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+  //           <Tag className="w-3 h-3" />
+  //           {product.category}
+  //         </div>
+  //       </div>
         
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-    </style>
-</head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
-    <!-- Header -->
-    <header class="sticky top-0 z-50 glass-effect">
-        <nav class="max-w-7xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center animate-glow">
-                        <span class="text-white font-bold text-lg">M</span>
-                    </div>
-                    <span class="text-xl font-bold gradient-text">ModernUI</span>
-                </div>
-                
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#" class="text-slate-700 hover:text-blue-600 transition-colors font-medium">Inicio</a>
-                    <a href="#" class="text-slate-700 hover:text-blue-600 transition-colors font-medium">Servicios</a>
-                    <a href="#" class="text-slate-700 hover:text-blue-600 transition-colors font-medium">Sobre Nosotros</a>
-                    <a href="#" class="text-slate-700 hover:text-blue-600 transition-colors font-medium">Contacto</a>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <button class="px-4 py-2 text-slate-700 hover:text-blue-600 transition-colors font-medium">
-                        Iniciar Sesión
-                    </button>
-                    <button class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                        Registrarse
-                    </button>
-                </div>
+  //       <button 
+  //         className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105"
+  //         disabled={!product.inStock}
+  //       >
+  //         {product.inStock ? 'Ver Detalles' : 'No Disponible'}
+  //       </button>
+  //     </div>
+  //   </div>
+  // );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Catálogo de Productos</h1>
+          <p className="text-gray-600">Descubre nuestra colección de productos premium</p>
+        </div>
+
+        {/* Barra de Búsqueda y Controles */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+            {/* Búsqueda */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
             </div>
-        </nav>
+
+            {/* Controles */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <Filter className="w-4 h-4" />
+                Filtros
+                <ChevronDown className={`w-4 h-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              </button>
+
+              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
+                >
+                  <Grid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Panel de Filtros */}
+          {showFilters && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Categoría */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>
+                        {cat === 'all' ? 'Todas las categorías' : cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Rango de Precio */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Precio</label>
+                  <select
+                    value={priceRange}
+                    onChange={(e) => setPriceRange(e.target.value)}
+                    className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  >
+                    {priceRanges.map(range => (
+                      <option key={range.value} value={range.value}>
+                        {range.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Ordenar */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Ordenar por</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  >
+                    {sortOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Limpiar Filtros */}
+                <div className="flex items-end">
+                  <button
+                    onClick={() => {
+                      setSearchTerm('');
+                      setSelectedCategory('all');
+                      setPriceRange('all');
+                      setSortBy('name');
+                    }}
+                    className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                  >
+                    Limpiar Filtros
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Resultados */}
+        <div className="mb-6">
+          <p className="text-gray-600">
+            Mostrando {filteredProducts.length} de {products.length} productos
+          </p>
+        </div>
+
+        {/* Grid de Productos */}
+        <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+          {filteredProducts.map(product => (
+            // <ProductCard key={product.id} product={product} />
+            <ProductCard 
+              products={product}
+            
+            />
+          ))}
+        </div>
+
+        {/* No hay resultados */}
+        {filteredProducts.length === 0 && (
+          <div className="text-center py-12">
+            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-gray-600 mb-2">No se encontraron productos</h3>
+            <p className="text-gray-500">Intenta ajustar tus filtros de búsqueda</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="es">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
+  return <Outlet />;
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  let message = "¡Oops!";
+  let details = "Ha ocurrido un error inesperado.";
+  let stack: string | undefined;
+
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? "404" : "Error";
+    details =
+      error.status === 404
+        ? "La página solicitada no se pudo encontrar."
+        : error.statusText || details;
+  } else if (import.meta.env.DEV && error && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
+
+  return (
+    <main className="pt-16 p-4 container mx-auto">
+      <h1 className="text-2xl font-bold text-red-600">{message}</h1>
+      <p className="text-gray-600 mt-2">{details}</p>
+      {stack && (
+        <pre className="w-full p-4 overflow-x-auto bg-gray-100 rounded mt-4">
+          <code>{stack}</code>
+        </pre>
+      )}
+    </main>
+  );
+}
+
+// layouts/AuthLayout.tsx - Layout para páginas de autenticación (login/register)
+import { Outlet, Navigate } from "react-router";
+import { useAuth } from "~/context/AuthContext";
+
+export default function AuthLayout() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Si ya está autenticado, redirigir al dashboard
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <Outlet />
+    </div>
+  );
+}
+
+// layouts/DashboardLayout.tsx - Layout principal para usuarios autenticados
+import { Outlet, Navigate } from "react-router";
+import { useState } from "react";
+import { useAuth } from "~/context/AuthContext";
+import { Header } from "~/Components/Layout/Header/Header";
+import { SideBar } from "~/Components/Layout/SideBar/SideBar";
+
+export default function DashboardLayout() {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
+  return (
+    <>
+      <SideBar 
+        sidebarOpen={sidebarOpen} 
+        setSidebarOpen={setSidebarOpen}
+        userRole={user?.role}
+      />
+      <div className={`flex flex-col min-h-screen transition-all duration-300 ease-in-out 
+        bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 
+        dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 
+        ${sidebarOpen ? "ml-64" : "ml-16"}`}>
+        
+        <Header 
+          sidebarOpen={sidebarOpen} 
+          setSidebarOpen={setSidebarOpen}
+          user={user}
+        />
+        
+        <main className="flex-1 pt-20 overflow-y-auto">
+          <Outlet />
+        </main>
+      </div>
+    </>
+  );
+}
+
+// layouts/AdminLayout.tsx - Layout específico para administradores
+import { Outlet } from "react-router";
+import { useAuth } from "~/context/AuthContext";
+import { ProtectedRoute } from "~/components/ProtectedRoute";
+
+export default function AdminLayout() {
+  return (
+    <ProtectedRoute requiredRoles={['admin']}>
+      <div className="admin-specific-styles">
+        {/* Header específico de admin si necesitas */}
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+          <p className="font-bold">Panel de Administración</p>
+        </div>
+        <Outlet />
+      </div>
+    </ProtectedRoute>
+  );
+}
+
+// layouts/ManagerLayout.tsx - Layout para managers
+import { Outlet } from "react-router";
+import { ProtectedRoute } from "~/components/ProtectedRoute";
+
+export default function ManagerLayout() {
+  return (
+    <ProtectedRoute requiredRoles={['admin', 'manager']}>
+      <div className="manager-specific-styles">
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+          <p className="font-bold">Panel de Gestión</p>
+        </div>
+        <Outlet />
+      </div>
+    </ProtectedRoute>
+  );
+}
+
+// Components/Layout/SideBar/SideBar.tsx - Sidebar actualizado con roles
+import { Link, useLocation } from "react-router";
+import { 
+  HomeIcon, 
+  UsersIcon, 
+  ShoppingBagIcon, 
+  CogIcon,
+  InboxIcon,
+  ChartBarIcon 
+} from "@heroicons/react/24/outline";
+
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  roles: string[];
+}
+
+const menuItems: MenuItem[] = [
+  {
+    name: "Dashboard",
+    href: "/dashboard",
+    icon: HomeIcon,
+    roles: ["admin", "manager", "user"],
+  },
+  {
+    name: "Productos",
+    href: "/dashboard/products",
+    icon: ShoppingBagIcon,
+    roles: ["admin", "manager"],
+  },
+  {
+    name: "Usuarios",
+    href: "/dashboard/admin/users",
+    icon: UsersIcon,
+    roles: ["admin"],
+  },
+  {
+    name: "Mensajes",
+    href: "/dashboard/messages",
+    icon: InboxIcon,
+    roles: ["admin", "manager", "user"],
+  },
+  {
+    name: "Reportes",
+    href: "/dashboard/admin/reports",
+    icon: ChartBarIcon,
+    roles: ["admin"],
+  },
+  {
+    name: "Configuración",
+    href: "/dashboard/settings",
+    icon: CogIcon,
+    roles: ["admin", "manager", "user"],
+  },
+];
+
+interface SideBarProps {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  userRole?: string;
+}
+
+export function SideBar({ sidebarOpen, setSidebarOpen, userRole }: SideBarProps) {
+  const location = useLocation();
+
+  const filteredMenuItems = menuItems.filter(item => 
+    userRole && item.roles.includes(userRole)
+  );
+
+  return (
+    <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 
+      transform ${sidebarOpen ? "translate-x-0" : "-translate-x-48"} 
+      transition-transform duration-300 ease-in-out shadow-lg`}>
+      
+      <div className="flex items-center justify-center h-16 bg-blue-600 dark:bg-blue-800">
+        <h1 className={`font-bold text-white transition-opacity duration-300 
+          ${sidebarOpen ? "opacity-100" : "opacity-0"}`}>
+          Mi Aplicación
+        </h1>
+      </div>
+
+      <nav className="mt-8">
+        <div className="px-4 space-y-2">
+          {filteredMenuItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg 
+                  transition-colors duration-200 ${
+                  isActive
+                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
+                    : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                }`}
+              >
+                <item.icon className="w-5 h-5 mr-3" />
+                <span className={`transition-opacity duration-300 ${
+                  sidebarOpen ? "opacity-100" : "opacity-0"
+                }`}>
+                  {item.name}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    </div>
+  );
+}
+
+// Components/Layout/Header/Header.tsx - Header actualizado
+import { useAuth } from "~/context/AuthContext";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+
+interface HeaderProps {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  user?: any;
+}
+
+export function Header({ sidebarOpen, setSidebarOpen, user }: HeaderProps) {
+  const { logout } = useAuth();
+
+  return (
+    <header className="fixed top-0 right-0 left-0 z-40 bg-white dark:bg-gray-800 
+      shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex items-center">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 
+              dark:text-gray-400 dark:hover:bg-gray-700"
+          >
+            <Bars3Icon className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <img
+              className="w-8 h-8 rounded-full"
+              src={user?.avatar || "https://i.pravatar.cc/32"}
+              alt={user?.name}
+            />
+            <div className="hidden md:block">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {user?.name}
+              </p>
+              <p className="text-xs text-gray-500 capitalize">
+                {user?.role}
+              </p>
+            </div>
+          </div>
+          
+          <button
+            onClick={logout}
+            className="px-3 py-2 text-sm font-medium text-white bg-red-600 
+              rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
     </header>
+  );
+}
 
-    <!-- Hero Section -->
-    <section class="relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-6 py-20">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div class="animate-slide-up">
-                    <div class="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-6">
-                        🚀 Nuevo diseño disponible
-                    </div>
-                    <h1 class="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
-                        Diseño
-                        <span class="gradient-text">Moderno</span>
-                        para el futuro
-                    </h1>
-                    <p class="text-xl text-slate-600 mb-8 leading-relaxed">
-                        Experimenta la próxima generación de interfaces con diseños limpios, animaciones fluidas y una experiencia de usuario excepcional.
-                    </p>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <button class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-2xl hover:shadow-blue-500/25 hover:scale-105">
-                            Comenzar Ahora
-                        </button>
-                        <button class="px-8 py-4 bg-white text-slate-700 rounded-2xl border border-slate-200 hover:border-slate-300 transition-all duration-300 font-semibold hover:bg-slate-50">
-                            Ver Demo
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="relative animate-fade-in">
-                    <div class="relative z-10 bg-white rounded-3xl shadow-2xl p-8 animate-float">
-                        <div class="space-y-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                            </div>
-                            <div class="bg-gradient-to-r from-slate-100 to-slate-200 rounded-lg h-4 animate-pulse"></div>
-                            <div class="space-y-2">
-                                <div class="bg-blue-100 rounded-lg h-3 w-3/4"></div>
-                                <div class="bg-purple-100 rounded-lg h-3 w-1/2"></div>
-                                <div class="bg-pink-100 rounded-lg h-3 w-5/6"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="absolute -top-4 -right-4 w-24 h-24 mesh-gradient rounded-full opacity-20"></div>
-                    <div class="absolute -bottom-8 -left-8 w-32 h-32 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-10 blur-xl"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+// routes.ts - Configuración de rutas con layouts
+import { type RouteConfig, index, layout, route } from "@react-router/dev/routes";
 
-    <!-- Features Section -->
-    <section class="py-20 bg-white/50">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-slate-900 mb-4">Características Principales</h2>
-                <p class="text-xl text-slate-600 max-w-2xl mx-auto">
-                    Todo lo que necesitas para crear experiencias digitales excepcionales
-                </p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-slate-900 mb-3">Rendimiento Ultrarrápido</h3>
-                    <p class="text-slate-600">Optimizado para velocidad con tiempos de carga inferiores a 1 segundo</p>
-                </div>
-                
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-slate-900 mb-3">Diseño Intuitivo</h3>
-                    <p class="text-slate-600">Interfaces pensadas para maximizar la experiencia del usuario</p>
-                </div>
-                
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-slate-900 mb-3">100% Confiable</h3>
-                    <p class="text-slate-600">Arquitectura robusta con 99.9% de tiempo de actividad garantizado</p>
-                </div>
-            </div>
-        </div>
-    </section>
+export default [
+  // Rutas de autenticación (sin sidebar/header)
+  layout("layouts/AuthLayout.tsx", [
+    route("auth/login", "pages/auth/Login.tsx"),
+    route("auth/register", "pages/auth/Register.tsx"),
+  ]),
 
-    <!-- Stats Section -->
-    <section class="py-20">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-12">
-                <div class="grid md:grid-cols-4 gap-8 text-center">
-                    <div>
-                        <div class="text-4xl font-bold text-white mb-2">50K+</div>
-                        <div class="text-slate-300">Usuarios Activos</div>
-                    </div>
-                    <div>
-                        <div class="text-4xl font-bold text-white mb-2">99.9%</div>
-                        <div class="text-slate-300">Tiempo Activo</div>
-                    </div>
-                    <div>
-                        <div class="text-4xl font-bold text-white mb-2">150+</div>
-                        <div class="text-slate-300">Países</div>
-                    </div>
-                    <div>
-                        <div class="text-4xl font-bold text-white mb-2">24/7</div>
-                        <div class="text-slate-300">Soporte</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+  // Rutas principales (con sidebar/header)
+  layout("layouts/DashboardLayout.tsx", [
+    route("dashboard", "pages/dashboard/Dashboard.tsx"),
+    route("dashboard/products", "pages/dashboard/Products.tsx"),
+    route("dashboard/messages", "pages/dashboard/Messages.tsx"),
+    route("dashboard/settings", "pages/dashboard/Settings.tsx"),
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div class="max-w-4xl mx-auto text-center px-6">
-            <h2 class="text-4xl font-bold text-slate-900 mb-6">
-                ¿Listo para comenzar?
-            </h2>
-            <p class="text-xl text-slate-600 mb-8">
-                Únete a miles de usuarios que ya disfrutan de la mejor experiencia digital
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-semibold shadow-2xl hover:shadow-blue-500/25 hover:scale-105">
-                    Comenzar Gratis
-                </button>
-                <button class="px-8 py-4 text-slate-700 hover:text-blue-600 transition-colors font-semibold">
-                    Contactar Ventas →
-                </button>
-            </div>
-        </div>
-    </section>
+    // Rutas de administrador
+    layout("layouts/AdminLayout.tsx", [
+      route("dashboard/admin/users", "pages/admin/Users.tsx"),
+      route("dashboard/admin/reports", "pages/admin/Reports.tsx"),
+    ]),
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <div class="flex items-center space-x-3 mb-6">
-                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                            <span class="text-white font-bold text-lg">M</span>
-                        </div>
-                        <span class="text-xl font-bold">ModernUI</span>
-                    </div>
-                    <p class="text-slate-400">
-                        Creando el futuro del diseño digital con interfaces modernas y experiencias excepcionales.
-                    </p>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold mb-4">Producto</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Características</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Precios</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Documentación</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold mb-4">Empresa</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Sobre Nosotros</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Carreras</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-semibold mb-4">Soporte</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="#" class="hover:text-white transition-colors">Centro de Ayuda</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Contacto</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors">Estado</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="border-t border-slate-800 mt-12 pt-8 text-center text-slate-400">
-                <p>&copy; 2025 ModernUI. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
+    // Rutas de manager
+    layout("layouts/ManagerLayout.tsx", [
+      route("dashboard/manager/analytics", "pages/manager/Analytics.tsx"),
+    ]),
+  ]),
 
-    <script>
-        // Smooth scroll behavior
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+  // Ruta raíz redirige al dashboard
+  index("pages/Home.tsx"),
+] satisfies RouteConfig;
 
-        // Add scroll effects
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const parallax = document.querySelector('.mesh-gradient');
-            if (parallax) {
-                parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
+// pages/Home.tsx - Página de inicio que redirige
+import { Navigate } from "react-router";
+import { useAuth } from "~/context/AuthContext";
 
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
+export default function Home() {
+  const { isAuthenticated, isLoading } = useAuth();
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-slide-up');
-                }
-            });
-        }, observerOptions);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
-        // Observe elements for animation
-        document.querySelectorAll('.card-hover').forEach(card => {
-            observer.observe(card);
-        });
-    </script>
-</body>
-</html>
+  return isAuthenticated ? 
+    <Navigate to="/dashboard" replace /> : 
+    <Navigate to="/auth/login" replace />;
+}
+
+// Estructura de carpetas recomendada:
+/*
+app/
+├── routes.ts
+├── root.tsx
+├── context/
+│   └── AuthContext.tsx
+├── layouts/
+│   ├── AuthLayout.tsx
+│   ├── DashboardLayout.tsx
+│   ├── AdminLayout.tsx
+│   └── ManagerLayout.tsx
+├── pages/
+│   ├── Home.tsx
+│   ├── auth/
+│   │   ├── Login.tsx
+│   │   └── Register.tsx
+│   ├── dashboard/
+│   │   ├── Dashboard.tsx
+│   │   ├── Products.tsx
+│   │   ├── Messages.tsx
+│   │   └── Settings.tsx
+│   ├── admin/
+│   │   ├── Users.tsx
+│   │   └── Reports.tsx
+│   └── manager/
+│       └── Analytics.tsx
+├── components/
+│   ├── ProtectedRoute.tsx
+│   └── Layout/
+│       ├── Header/
+│       │   └── Header.tsx
+│       └── SideBar/
+│           └── SideBar.tsx
+└── services/
+    └── authService.ts
