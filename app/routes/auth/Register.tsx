@@ -93,7 +93,11 @@ export default function Register() {
                 name="password"
                 type="password"
                 required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className={` relative block w-full px-3 py-2 focus:ring-blue-500 focus:border-blue-500 rounded-md focus:outline-none border ${
+                  error || validationError ? 'border-red-500 text-red-400 focus:ring-red-600 focus:border-red-600': ' border-gray-300 placeholder-gray-500text-gray-900  '
+
+
+                }`}
                 placeholder="Contraseña"
                 value={formData.password}
                 onChange={handleChange}

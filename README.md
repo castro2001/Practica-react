@@ -60,6 +60,20 @@ Your application will be available at `http://localhost:5173`.
 
 ## Building for Production
 
+## Descargar CLI Tailwind css 
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+```
+
+## Crea los archivos de configuración
+
+```bash
+npx tailwindcss init -p
+
+```
+
+
 Create a production build:
 
 ```bash

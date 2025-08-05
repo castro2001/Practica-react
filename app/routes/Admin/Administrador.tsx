@@ -1,6 +1,7 @@
 import { useAuth } from '~/context/Auth/authContext'; 
 import { Welcome } from '~/Components/shared/Welcome/Welcome'; 
 import { getCookie } from '~/utils/cookies';
+import { Input } from '~/Components/ui/Form/Input/input';
 
 export default function Administrador() {
   const { user, getToken ,isAuthenticated} = useAuth();
@@ -13,12 +14,13 @@ export default function Administrador() {
 
   return (
     <>
-    <Welcome 
+    {/* <Welcome 
       title={`Bienvenido ${user?.name} `}
       image={user?.avatar}
       descripcion={description}
     
-    />
+    /> */}
+    
     
     </>
   )

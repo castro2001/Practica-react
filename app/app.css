@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* @import url("./style/form/form.css"); */
 /* @import url("./Components/Layout/SideBar/SideBar.css"); */
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,

@@ -16,7 +16,7 @@ interface ICardThemes{
 
 interface ISection{
     classNameContainer:string;
-    content:React.ReactNode;
+    children:React.ReactNode;
 }
 
 interface IPreloadCard extends ICardMain {}
