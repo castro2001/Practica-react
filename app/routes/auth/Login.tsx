@@ -4,6 +4,7 @@ import { Section } from '~/Components/Layout/Section/Section';
 import { InputComponente } from '~/Components/ui/Form/Input/input';
 import { useAuth } from '~/context/Auth/authContext'; 
 import { styleContenedor, styleInput, styleLabel } from '~/data/themes/formulario';
+import type { Props } from '~/types/forms';
 
 export default function Login() {
   const { login, isAuthenticated, isLoading, error } = useAuth();
@@ -36,9 +37,9 @@ export default function Login() {
 const fields: Props<typeof formData>["fields"] = [
   {
     name: "email",
-    classNameLabel:"floating-label",
-    classNameContenedor:"floating-form",
-    classNameInput:"floating-input",
+   classNameLabel:styleLabel,
+    classNameContenedor:styleContenedor,
+    classNameInput:styleInput,
     label: "Correo Electrónico",
     type: "email",
     placeholder: "correo@ejemplo.com",

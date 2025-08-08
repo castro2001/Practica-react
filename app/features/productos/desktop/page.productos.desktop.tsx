@@ -3,11 +3,14 @@ import BackgroundDefault from "~/assets/image/background_default.png"
 import { useNavigate } from "react-router";
 import { Modal } from "~/Components/ui/Modal/Modal";
 import { useState } from "react";
+import { InputComponente } from "~/Components/ui/Form/Input/input";
+import type { Props } from "~/types/forms";
 
   interface PageProductosDesktopProps {
   product: IProduct;
   actions: IActionsDataBody;
 }
+import { styleContenedor, styleInput, styleLabel } from '~/data/themes/formulario';
 
 
 export const PageProductosDesktop: React.FC<PageProductosDesktopProps> = ({ product, actions }) => {
@@ -16,6 +19,38 @@ export const PageProductosDesktop: React.FC<PageProductosDesktopProps> = ({ prod
   const navigate = useNavigate();
   const [isBasicModalOpen, setIsBasicModalOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+ const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
+
+
+
+const fields: Props<typeof formData>["fields"] = [
+  {
+    name: "email",
+   classNameLabel:styleLabel,
+    classNameContenedor:styleContenedor,
+    classNameInput:styleInput,
+    label: "Correo Electrónico",
+    type: "email",
+    placeholder: "correo@ejemplo.com",
+  },
+  {
+    classNameLabel:styleLabel,
+    classNameContenedor:styleContenedor,
+    classNameInput:styleInput,
+    name: "password",
+    label: "Contraseña",
+    type: "password",
+    placeholder: "Contraseña",
+  },
+];
+
+
+
+
+
 
  const handleView = () => {
         navigate(`/dashboard/Productos/Detalle/${id}`, { state: { product } }); // ✅ Navegación con estado
@@ -125,12 +160,15 @@ isOpen={isBasicModalOpen}
         </svg>
       </div>
     </div>
-    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-50 mb-2">
-    {title}
-    </h3>
-    <p className="text-gray-500 dark:text-gray-50 mb-6">
-      {description}
-    </p>
+<InputComponente
+fields={editarForm}
+onChange={onChange}
+
+/>
+
+
+
+
     <button
       onClick={() => setIsBasicModalOpen(false)}
       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors duration-200"

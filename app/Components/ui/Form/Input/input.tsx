@@ -1,5 +1,11 @@
+import type { Props } from "~/types/forms";
 
-export const InputComponente = <T,>({ fields, values, onChange }: Props<T>) => {
+export const InputComponente = <T,>(props:Props<T>) => {
+  
+  const { fields, values, onChange} = props
+
+  
+  
   return (
     <>
       {fields.map(({ name, label, type, placeholder,classNameContenedor, classNameInput,classNameLabel }) => (
@@ -18,7 +24,7 @@ export const InputComponente = <T,>({ fields, values, onChange }: Props<T>) => {
             onChange={onChange}
             value={String(values[name])}
             className={`${classNameInput ? classNameInput : 'bg-green-50 border border-green-500 text-green-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5'}`}
-        
+            
           />
         </div>
       ))}

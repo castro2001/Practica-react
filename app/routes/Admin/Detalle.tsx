@@ -229,9 +229,8 @@ const { tipo, id } = useParams();
             {tipo === "Usuario" && (
                <Section 
               classNameContainer=""
-              content={
-                  <>
-                  <Card  titulo="Nombre" 
+          
+                 >    <Card  titulo="Nombre" 
                   subtitulo="Información personal" 
                   icon={<User className="w-6 h-6 text-white" />} 
                   content={currentProduct.name || 'No disponible'} 
@@ -250,9 +249,7 @@ const { tipo, id } = useParams();
                   icon={<User className="w-6 h-6 text-white" />} 
                   content={currentProduct.role || 'No disponible'} 
                      themes={themeUsuario3}
-                  />
-                   </>  
-              } />
+                  /></Section>
             )}
 
             {/* Descripción completa en card separada */}
